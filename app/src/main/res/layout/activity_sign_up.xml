@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SignUp"
+    android:padding="150px"
+    >
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="שם מלא"
+        android:id="@+id/fullname"
+        />
+    <EditText
+        android:id="@+id/mail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="אימייל"
+        />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="סיסמה"
+
+        />
+
+    <AutoCompleteTextView
+        android:id="@+id/cityMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="עיר מגורים"
+        android:completionThreshold="1"
+        />
+
+    <Button
+        android:id="@+id/studentSignUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="הרשם בתור תלמיד"
+        />
+    <Button
+        android:id="@+id/loginAsATeacher"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="הרשם בתור מורה"
+        />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="כבר רשום התחבר"
+        />
+
+
+</LinearLayout>

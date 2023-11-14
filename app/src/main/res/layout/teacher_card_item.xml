@@ -1,0 +1,81 @@
+<!-- teacher_card_item.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Display teacher's profile picture -->
+    <ImageView
+        android:id="@+id/profilePic"
+        android:layout_width="match_parent"
+        android:layout_height="128dp"
+        android:src="@drawable/default_profile_pic"
+        android:scaleType="centerCrop"/>
+
+    <!-- Display other information -->
+    <TextView
+        android:id="@+id/fullname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="שם מלא"
+        />
+    <TextView
+        android:id="@+id/rating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="דירוג"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+
+        >
+        <TextView
+            android:id="@+id/wayOfLearning"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="דרך לימוד"
+            android:paddingHorizontal="10dp"
+            />
+        <TextView
+            android:id="@+id/pricePerHour"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="מחיר לשעה"
+            android:paddingHorizontal="10dp"
+            />
+        <TextView
+            android:id="@+id/city"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="עיר"
+            android:paddingHorizontal="10dp"
+            />
+
+        <TextView
+            android:id="@+id/subjects"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="מקצועות"
+            android:paddingHorizontal="10dp"
+            />
+
+    </LinearLayout>
+</LinearLayout>
