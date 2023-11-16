@@ -18,7 +18,9 @@ public class Teacher {
     private String  profilePic; // represented a String of 64bit incoding
 
     private int rating;
-
+    public Teacher() {
+        // Default constructor required for Firebase
+    }
     public Teacher(String fullname, String mail, String city, String uid, List<String> subjects,
                    String wayOfLearning, int pricePerHour, String description,  String profilePic) {
         this.fullname = fullname;
