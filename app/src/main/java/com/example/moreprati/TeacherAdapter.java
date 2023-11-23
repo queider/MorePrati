@@ -1,6 +1,9 @@
 package com.example.moreprati;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,39 +42,37 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView fullNameTextView;
-        //public TextView ratingTextView;
+        public TextView ratingTextView;
         public TextView wayOfLearningTextView;
         public TextView pricePerHourTextView;
         public TextView cityTextView;
-        //public TextView subjectsTextView;
-        //public ImageView profileImageView;
-        // Add other views as needed
+        public TextView subjectsTextView;
+        public ImageView profileImageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             fullNameTextView = itemView.findViewById(R.id.fullname);
-            //ratingTextView = itemView.findViewById(R.id.rating);
+            ratingTextView = itemView.findViewById(R.id.rating);
             wayOfLearningTextView = itemView.findViewById(R.id.wayOfLearning);
             pricePerHourTextView = itemView.findViewById(R.id.pricePerHour);
             cityTextView = itemView.findViewById(R.id.city);
-            //subjectsTextView = itemView.findViewById(R.id.subjects);
-            //profileImageView = itemView.findViewById(R.id.profilePic);
-            // Initialize other views here
+            subjectsTextView = itemView.findViewById(R.id.subjects);
+            profileImageView = itemView.findViewById(R.id.profilePic);
         }
 
         public void bind(Teacher teacher) {
             // Bind data to views
             fullNameTextView.setText(teacher.getFullname());
-            //ratingTextView.setText(String.valueOf(teacher.getRating()));
+            ratingTextView.setText(String.valueOf(teacher.getRating()));
             wayOfLearningTextView.setText(teacher.getWayOfLearning());
             pricePerHourTextView.setText(String.valueOf(teacher.getPricePerHour()));
             cityTextView.setText(teacher.getCity());
-            //subjectsTextView.setText(TextUtils.join(", ", teacher.getSubjects()));
+            subjectsTextView.setText(TextUtils.join(", ", teacher.getSubjects()));
 
-            // Load profile picture using Picasso (replace "default_profile_image" with your default image resource)
-            //Picasso.get().load(teacher.getProfilePic()).placeholder(R.drawable.default_profile_pic).into(profileImageView);
+            Log.d("TAG", "bind: "+ teacher.getImage());
+            Picasso.get().load(teacher.getImage()).placeholder(R.drawable.default_profile_pic).into(profileImageView);
 
-            // Add code to bind other attributes (description, etc.) as needed
+
         }
     }
 }

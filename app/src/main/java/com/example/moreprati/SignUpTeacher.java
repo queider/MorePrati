@@ -32,6 +32,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -47,18 +49,38 @@ public class SignUpTeacher extends AppCompatActivity {
 
 
     private MultiAutoCompleteTextView multiAutoCompleteTextView;
-    private String[] subjects = new String[0];
+
 
     //profile pic
-    ImageView profilePic;
-    Button cameraButton;
-    String profilePic64;
+    private ImageView profilePic;
+    private Button cameraButton;
+    private String profilePicUri;
+    private Uri profilePicLocalUri;
+
+
+    //varablbes ----------
+    private String fullname;
+    private String mail;
+    private String password;
+    private String city;
+
+    private String[] subjects = new String[0];
+
+    private String wayOfLearningString;
+    private int pricePerHour;
+
+    private String description;
+
+    private String uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up_teacher);
-        //camara
+
+
+        //camara -----------------------------------------------------------------------------------
+
         profilePic = findViewById(R.id.profilePic);
         cameraButton = findViewById(R.id.cameraButton);
 
@@ -67,9 +89,9 @@ public class SignUpTeacher extends AppCompatActivity {
             public void onClick(View view) {
 
                 ImagePicker.with(SignUpTeacher.this)
-                        .crop(1f, 1f)	    			//Crop image(Optional), Check Customization for more option
-                        .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                        .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
+                        .crop(1f, 1f)                    //Crop image(Optional), Check Customization for more option
+                        .compress(1024)            //Final image size will be less than 1 MB(Optional)
+                        .maxResultSize(1080, 1080)    //Final image resolution will be less than 1080 x 1080(Optional)
                         .start();
             }
         });
@@ -77,10 +99,10 @@ public class SignUpTeacher extends AppCompatActivity {
         // Get info from signup ------------------------------------------------
 
         Intent intent = getIntent();
-        String fullname = intent.getStringExtra("fullname");
-        String mail = intent.getStringExtra("mail");
-        String password = intent.getStringExtra("password");
-        String city = intent.getStringExtra("city");
+         fullname = intent.getStringExtra("fullname");
+         mail = intent.getStringExtra("mail");
+         password = intent.getStringExtra("password");
+         city = intent.getStringExtra("city");
 
 
         // Displays the full name ------------------------------------------------------------------
@@ -112,9 +134,9 @@ public class SignUpTeacher extends AppCompatActivity {
             public void onClick(View view) {
                 // Get the selected values from the MultiAutoCompleteTextView
                 String text = multiAutoCompleteTextView.getText().toString();
-                String pricePerHour = ((EditText) findViewById(R.id.pricePerHour)).getText().toString();
-                String description = ((EditText) findViewById(R.id.description)).getText().toString();
-                String wayOfLearningString = wayOfLearning.getText().toString();
+                pricePerHour = Integer.parseInt(((EditText) findViewById(R.id.pricePerHour)).getText().toString());
+                description = ((EditText) findViewById(R.id.description)).getText().toString();
+                wayOfLearningString = wayOfLearning.getText().toString();
 
                 if (!text.isEmpty()) {
                     // Add the selected value to the array
@@ -122,11 +144,9 @@ public class SignUpTeacher extends AppCompatActivity {
                     System.arraycopy(subjects, 0, newValues, 0, subjects.length);
                     newValues[subjects.length] = text;
                     subjects = newValues;
-                    // Clear the MultiAutoCompleteTextView
-                    multiAutoCompleteTextView.setText("");
                 }
-                if (validation(wayOfLearningString, pricePerHour, description, subjects, profilePic64)) {
-                    registerTeacher(fullname, mail, password, city, subjects, wayOfLearningString, pricePerHour, description, profilePic64);
+                if (validation()) {
+                    registerTeacher();
                 }
 
             }
@@ -145,6 +165,8 @@ public class SignUpTeacher extends AppCompatActivity {
 
     }
 
+
+
     private void goToSignUpActivity() {
         // Create an Intent to start the SignUp activity
         Intent intent = new Intent(this, SignUp.class);
@@ -152,52 +174,25 @@ public class SignUpTeacher extends AppCompatActivity {
         // Start the SignUp activity
         startActivity(intent);
     }
+
+
+
     // camara and profile pic -------------------------------------------------------------------------------------
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Uri uri = data.getData();
         profilePic.setImageURI(uri);
-        profilePic64 = uriToBase64(this, uri);
+        profilePicLocalUri = uri;
 
     }
-    public static String uriToBase64(Context context, Uri imageUri) {
-        try {
-            // 1. Load the image data from the URI
-            InputStream inputStream = context.getContentResolver().openInputStream(imageUri);
-
-            if (inputStream == null) {
-                return null;
-            }
-
-            // 2. Convert the image data to a byte array
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, bytesRead);
-            }
-
-            byte[] imageBytes = byteArrayOutputStream.toByteArray();
-
-            // 3. Encode the byte array to a base64 string
-            String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-
-            return base64Image;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null; // Handle the exception
-        }
-    }
 
 
-    private void registerTeacher(String fullname, String mail, String password, String city, String[] subjects, String wayOfLearningString , String pricePerHour, String description, String profilePic64) {
+    private void registerTeacher() {
+        Log.d(TAG, "registerTeacher: " + mail);
+        Log.d(TAG, "registerTeacher: " + password);
 
-
-        mAuth.createUserWithEmailAndPassword(mail, password)
+    mAuth.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -208,10 +203,11 @@ public class SignUpTeacher extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
 
                             FirebaseUser user = mAuth.getCurrentUser();
-                            String uid = user.getUid();
-
+                            uid = user.getUid();
+                            uploadProfilePicToStorage(profilePicLocalUri);
+                            Log.d("dasfasdasd", "profilePicUri is (in registration): " + profilePicUri);
                             // Now you can link the user to additional information in the database
-                            linkUserToDatabase( fullname,  mail,  city,  uid , subjects,  wayOfLearningString , pricePerHour,  description, profilePic64);
+
 
 
                         } else {
@@ -224,16 +220,18 @@ public class SignUpTeacher extends AppCompatActivity {
                 });
     }
     // Adding the student to the db -----------------------------------------------------------
-    private void linkUserToDatabase(String fullname, String mail, String city, String uid, String[] subjects, String wayOfLearningString , String pricePerHour, String description, String profilePic64) {
-        Teacher teacher = new Teacher( fullname,  mail,  city,  uid , Arrays.asList(subjects) /* firebase dosn't exept Arrays only Lists. */,  wayOfLearningString , Integer.parseInt(pricePerHour),  description,  profilePic64);
+    private void linkUserToDatabase() {
+        Teacher teacher = new Teacher( fullname,  mail,  city,  uid , Arrays.asList(subjects) /* firebase dosn't exept Arrays only Lists. */,  wayOfLearningString , pricePerHour,  description,  profilePicUri);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         String userKey = usersRef.push().getKey();
         usersRef.child(userKey).setValue(teacher);
         Log.d(TAG, "linkUserToDatabase: Registers teacher");
     }
 
-    private boolean validation(String wayOfLearning, String pricePerHour, String description, String[] subjects, String profilePicBytes) {
+    private boolean validation() {
         // checks if all fields are entered.
+
+        /*
         if(wayOfLearning.isEmpty() || pricePerHour.isEmpty() || description.isEmpty() || subjects[0] == null) {
             Toast.makeText(this, "מלא את כל השדות", Toast.LENGTH_SHORT).show();
             return false;
@@ -264,12 +262,35 @@ public class SignUpTeacher extends AppCompatActivity {
             return false;
         }
 
-        if(profilePicBytes == null) {
+        if(profilePicLocalUri == null) {
             Toast.makeText(this, "העלה תמונת פרופיל", Toast.LENGTH_SHORT).show();
             return false;
         }
-
+        */
         return true;
+    }
+    private void uploadProfilePicToStorage(Uri imageUri) {
+        // Get a reference to the storage location
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("profile_pics/" + System.currentTimeMillis() + ".jpg");
+
+        // Upload the image
+        storageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Image uploaded successfully
+                    storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        // Get the download URL and store it in your class variable or wherever you need it
+                        profilePicUri =  uri.toString();
+                        Log.d("uploadProfilePicToStorage: ", "File is uplouded and uri is: " + profilePicUri);
+                        linkUserToDatabase();
+                        // Perform any actions that depend on the download URL here
+
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    // Handle unsuccessful upload
+                    Log.d(TAG, "uploadProfilePicToStorage: FAIL");
+                    e.printStackTrace();
+                });
     }
 
 }

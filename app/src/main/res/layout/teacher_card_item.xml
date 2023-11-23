@@ -7,10 +7,11 @@
     android:padding="16dp">
 
     <!-- Display teacher's profile picture -->
+
     <ImageView
         android:id="@+id/profilePic"
         android:layout_width="match_parent"
-        android:layout_height="128dp"
+        android:layout_height="200dp"
         android:src="@drawable/default_profile_pic"
         android:scaleType="centerCrop"/>
 
@@ -19,10 +20,10 @@
         android:id="@+id/fullname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
         android:text="שם מלא"
-        />
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
     <TextView
         android:id="@+id/rating"
         android:layout_width="match_parent"

@@ -157,6 +157,9 @@ public class SignUp extends AppCompatActivity {
 
     // form validation --------------------------------------------------------------------------
     private boolean validation(String fullname, String mail, String passport, String city) {
+
+
+        /*
         // checks if all fields are entered.
         if(fullname.isEmpty() || mail.isEmpty() || passport.isEmpty() || city.isEmpty()) {
             Toast.makeText(this, "מלא את כל השדות", Toast.LENGTH_SHORT).show();
@@ -195,7 +198,7 @@ public class SignUp extends AppCompatActivity {
             Toast.makeText(this, "סיסמה קצרה מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
-
+        */
         return true;
     }
 

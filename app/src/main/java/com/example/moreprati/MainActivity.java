@@ -1,5 +1,7 @@
 package com.example.moreprati;
 
+import static java.lang.Thread.sleep;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
             // User is authenticated (signed in)
             Toast.makeText(this, "User is authenticated", Toast.LENGTH_SHORT).show();
 
+            //startActivity(new Intent(MainActivity.this, SignUp.class));
+
+
         } else {
             // User is not authenticated (signed out)
             startActivity(new Intent(MainActivity.this, SignUp.class));
@@ -46,8 +51,31 @@ public class MainActivity extends AppCompatActivity {
 
         // recycler:
         teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
-
         setUpRecyclerView();
+        // Retrieve the first teacher
+        teachersRef.limitToFirst(2).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Teacher firstTeacher = snapshot.getValue(Teacher.class);
+
+                    if (firstTeacher != null) {
+                        String profilePicUri = firstTeacher.getImage();
+                        Log.d("TAG", "First Teacher's Profile Pic URI: " + profilePicUri);
+
+                        // Now you can use the profilePicUri as needed
+                    } else {
+                        Log.d("TAG", "No teacher found in the database.");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("TAG", "Database read error: " + databaseError.toException());
+            }
+        });
+
 
     }
     private void setUpRecyclerView() {
@@ -64,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(teacherAdapter);
     }
+
 
 
 

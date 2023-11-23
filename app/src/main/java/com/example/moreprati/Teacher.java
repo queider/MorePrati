@@ -15,14 +15,14 @@ public class Teacher {
     private int pricePerHour;
 
     private String description;
-    private String  profilePic; // represented a String of 64bit incoding
+    private String image;
 
     private int rating;
     public Teacher() {
         // Default constructor required for Firebase
     }
     public Teacher(String fullname, String mail, String city, String uid, List<String> subjects,
-                   String wayOfLearning, int pricePerHour, String description,  String profilePic) {
+                   String wayOfLearning, int pricePerHour, String description,  String image) {
         this.fullname = fullname;
         this.mail = mail;
         this.city = city;
@@ -31,7 +31,7 @@ public class Teacher {
         this.wayOfLearning = wayOfLearning;
         this.pricePerHour = pricePerHour;
         this.description = description;
-        this.profilePic =  profilePic;
+        this.image =  image;
         this.rating = 0;
     }
 
@@ -101,12 +101,12 @@ public class Teacher {
         this.description = description;
     }
 
-    public String getProfilePic() {
-        return profilePic;
+    public String getImage() {
+        return image;
     }
 
-    public void setProfilePic(String setProfilePic) {
-        this.profilePic = profilePic;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public int getRating() {
