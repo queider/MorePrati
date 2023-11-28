@@ -28,10 +28,13 @@ import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -41,13 +44,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
 public class SignUpTeacher extends AppCompatActivity {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance(); // firebase thing
-
-
+    SubjectMapper subjectMapper = new SubjectMapper();
+    Map<String, Boolean> subjectMap;
     private MultiAutoCompleteTextView multiAutoCompleteTextView;
 
 
@@ -118,6 +122,7 @@ public class SignUpTeacher extends AppCompatActivity {
         multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
 
+
         // Setup AutoCompleteTextView wayOfLearning --------------------------------------------------
         AutoCompleteTextView wayOfLearning = findViewById(R.id.wayOfLearning);
 
@@ -139,11 +144,17 @@ public class SignUpTeacher extends AppCompatActivity {
                 wayOfLearningString = wayOfLearning.getText().toString();
 
                 if (!text.isEmpty()) {
-                    // Add the selected value to the array
-                    String[] newValues = new String[subjects.length + 1];
-                    System.arraycopy(subjects, 0, newValues, 0, subjects.length);
-                    newValues[subjects.length] = text;
-                    subjects = newValues;
+                    subjects = processString(text);
+                    for (int i = 0; i < subjects.length; i++) {
+                        Log.d(TAG, "subject " + i + ": " + subjects[i]);
+                    }
+
+                    subjectMap = SubjectMapper.mapSubjects(subjects);
+
+                    // log the values of the map
+                    for (Map.Entry<String, Boolean> entry : subjectMap.entrySet()) {
+                        Log.d("YAZAN", "SubjectMap " +entry.getKey() + ": " + entry.getValue());
+                    }
                 }
                 if (validation()) {
                     registerTeacher();
@@ -165,7 +176,15 @@ public class SignUpTeacher extends AppCompatActivity {
 
     }
 
+    private String[] processString(String input) {
+        // Remove commas
+        String stringWithoutCommas = input.replaceAll(",", "");
 
+        // Split the string into an array using spaces
+        String[] wordsArray = stringWithoutCommas.split("\\s+");
+
+        return wordsArray;
+    }
 
     private void goToSignUpActivity() {
         // Create an Intent to start the SignUp activity
@@ -192,6 +211,7 @@ public class SignUpTeacher extends AppCompatActivity {
         Log.d(TAG, "registerTeacher: " + mail);
         Log.d(TAG, "registerTeacher: " + password);
 
+
     mAuth.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -205,11 +225,6 @@ public class SignUpTeacher extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             uid = user.getUid();
                             uploadProfilePicToStorage(profilePicLocalUri);
-                            Log.d("dasfasdasd", "profilePicUri is (in registration): " + profilePicUri);
-                            // Now you can link the user to additional information in the database
-
-
-
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -221,7 +236,7 @@ public class SignUpTeacher extends AppCompatActivity {
     }
     // Adding the student to the db -----------------------------------------------------------
     private void linkUserToDatabase() {
-        Teacher teacher = new Teacher( fullname,  mail,  city,  uid , Arrays.asList(subjects) /* firebase dosn't exept Arrays only Lists. */,  wayOfLearningString , pricePerHour,  description,  profilePicUri);
+        Teacher teacher = new Teacher( fullname,  mail,  city,  uid , subjectMap,  wayOfLearningString , pricePerHour,  description,  profilePicUri);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         String userKey = usersRef.push().getKey();
         usersRef.child(userKey).setValue(teacher);

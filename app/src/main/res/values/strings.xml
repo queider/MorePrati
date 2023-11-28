@@ -1,4 +1,11 @@
 <resources>
+
+    <string-array name="Cityes">
+
+
+    </string-array>
+
+
     <string name="app_name">MorePrati</string>
     <string name="title_activity_login">Login</string>
     <string name="prompt_email">Email</string>
@@ -9,4 +16,9 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+
+    <string name="select_subject">"מקצוע"</string>
+    <string name="select_city">"עיר לימוד"</string>
+    <string name="select_price">"מחיר עד"</string>
+    <string name="select_wayOflearning">"אופן לימוד"</string>
 </resources>

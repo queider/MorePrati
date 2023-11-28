@@ -1,6 +1,6 @@
 package com.example.moreprati;
 
-import java.util.List;
+import java.util.Map;
 
 public class Teacher {
     private String fullname;
@@ -8,9 +8,9 @@ public class Teacher {
     private String city;
     private String uid;
 
-    private List<String> subjects; // can be math, english, guitar and music
+    private Map<String, Boolean> subjects;
 
-    private String wayOfLearning; //ether online, face to face or both
+    private String wayOfLearning; // ether online, face to face or both
 
     private int pricePerHour;
 
@@ -18,11 +18,13 @@ public class Teacher {
     private String image;
 
     private int rating;
+
+    // Default constructor required for Firebase
     public Teacher() {
-        // Default constructor required for Firebase
     }
-    public Teacher(String fullname, String mail, String city, String uid, List<String> subjects,
-                   String wayOfLearning, int pricePerHour, String description,  String image) {
+
+    public Teacher(String fullname, String mail, String city, String uid, Map<String, Boolean> subjects,
+                   String wayOfLearning, int pricePerHour, String description, String image) {
         this.fullname = fullname;
         this.mail = mail;
         this.city = city;
@@ -31,7 +33,7 @@ public class Teacher {
         this.wayOfLearning = wayOfLearning;
         this.pricePerHour = pricePerHour;
         this.description = description;
-        this.image =  image;
+        this.image = image;
         this.rating = 0;
     }
 
@@ -69,11 +71,11 @@ public class Teacher {
         this.uid = uid;
     }
 
-    public List<String> getSubjects() {
+    public Map<String, Boolean> getSubjects() {
         return subjects;
     }
 
-    public void setSubjects(List<String> subjects) {
+    public void setSubjects(Map<String, Boolean> subjects) {
         this.subjects = subjects;
     }
 
@@ -114,7 +116,6 @@ public class Teacher {
     }
 
     public void setRating(int rating) {
-        this.pricePerHour = rating;
+        this.rating = rating;
     }
-
 }

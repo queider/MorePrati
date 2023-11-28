@@ -67,7 +67,18 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
             wayOfLearningTextView.setText(teacher.getWayOfLearning());
             pricePerHourTextView.setText(String.valueOf(teacher.getPricePerHour()));
             cityTextView.setText(teacher.getCity());
-            subjectsTextView.setText(TextUtils.join(", ", teacher.getSubjects()));
+
+            // Extract subjects from the map and join them into a string
+            StringBuilder subjectsStringBuilder = new StringBuilder();
+            for (String subject : teacher.getSubjects().keySet()) {
+                if (teacher.getSubjects().get(subject)) {
+                    if (subjectsStringBuilder.length() > 0) {
+                        subjectsStringBuilder.append(", ");
+                    }
+                    subjectsStringBuilder.append(subject);
+                }
+            }
+            subjectsTextView.setText(subjectsStringBuilder.toString());
 
             Log.d("TAG", "bind: "+ teacher.getImage());
             Picasso.get().load(teacher.getImage()).placeholder(R.drawable.default_profile_pic).into(profileImageView);
