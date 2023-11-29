@@ -11,6 +11,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +20,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -32,12 +35,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    //menu:
+
+    private BottomNavigationView bottomNavigationView;
+
+
     // User Logging Things -------------------------
     public Teacher teacherUserInfo;
     public Student studentUserInfo;
 
     public boolean ifTeacher;
 
+    private String uid;
 
 
     //firebase database things -----------------------------
@@ -119,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             // User is authenticated (signed in)
             Toast.makeText(this, "User is authenticated", Toast.LENGTH_SHORT).show();
 
-            startActivity(new Intent(MainActivity.this, SignUp.class));
+            startActivity(new Intent(MainActivity.this, ChatActivity.class));
 
 
         } else {
@@ -160,12 +169,35 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // get logged in user inforamtion from database: --------------------------------------------
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         searchTeacherByUid(uid);
 
 
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.action_home && !isCurrentActivity(MainActivity.class)) {
+                    startActivity(new Intent(MainActivity.this, MainActivity.class));
+
+                    Log.d("YAZAN", "[*] NAVBAR: pressed home");
+                    return true;
+                } else if (item.getItemId() == R.id.action_chat && !isCurrentActivity(Login.class)) {
+                    startActivity(new Intent(MainActivity.this, Login.class));
+                    Log.d("YAZAN", "[*] NAVBAR: pressed chat");
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
+    private boolean isCurrentActivity(Class<?> activityClass) {
+        return activityClass.isInstance(MainActivity.this);
+    }
+//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//
+//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//
+//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//ON-CREATE-END//
     private void searchTeacherByUid(String uid) {
         teachersRef.orderByChild("uid").equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -222,6 +254,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("YAZAN", "[-] Error searching for student: " + error.getMessage());
             }
         });
+
+
+
     }
 
     private void handleFoundTeacher(Teacher teacher) {

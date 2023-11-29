@@ -241,8 +241,12 @@ public class SignUpTeacher extends AppCompatActivity {
         String userKey = usersRef.push().getKey();
         usersRef.child(userKey).setValue(teacher);
         Log.d(TAG, "linkUserToDatabase: Registers teacher");
+        goToMainActivity();
     }
 
+    private void goToMainActivity(){
+        startActivity(new Intent(SignUpTeacher.this, MainActivity.class));
+    }
     private boolean validation() {
         // checks if all fields are entered.
 

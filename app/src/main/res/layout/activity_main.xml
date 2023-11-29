@@ -16,12 +16,12 @@
         >
         <com.google.android.material.button.MaterialButton
             android:layout_marginTop="-10dp"
-            android:id="@+id/clear_button"
+            android:id="@+id/search_button"
+            style="?attr/materialIconButtonFilledStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@android:drawable/ic_input_delete"
-            style="?attr/materialIconButtonFilledStyle"
-            />
+            app:icon="@android:drawable/ic_search_category_default" />
+
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -63,28 +63,37 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        >
         <com.google.android.material.button.MaterialButton
+            android:layout_marginTop="-10dp"
+            android:id="@+id/clear_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/search_button"
-            app:icon="@android:drawable/ic_search_category_default"
+            app:icon="@android:drawable/ic_input_delete"
             style="?attr/materialIconButtonFilledStyle"
-        />
-
+            />
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_navigation_menu" />
+
 
 </LinearLayout>
