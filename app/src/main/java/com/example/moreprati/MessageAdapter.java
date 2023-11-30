@@ -37,17 +37,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        private TextView senderTextView;
         private TextView messageTextView;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
-            senderTextView = itemView.findViewById(R.id.senderTextView);
             messageTextView = itemView.findViewById(R.id.messageTextView);
         }
 
         public void bind(Message message) {
-            senderTextView.setText(message.getSenderId());
             messageTextView.setText(message.getMessageText());
         }
     }

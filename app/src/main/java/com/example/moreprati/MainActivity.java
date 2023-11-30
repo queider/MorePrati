@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -81,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
+
         //menu things ------------------------------------------------------------------------
         cites = getResources().getStringArray(R.array.cites);
 
@@ -128,12 +132,14 @@ public class MainActivity extends AppCompatActivity {
             // User is authenticated (signed in)
             Toast.makeText(this, "User is authenticated", Toast.LENGTH_SHORT).show();
 
-            startActivity(new Intent(MainActivity.this, ChatActivity.class));
+            startActivity(new Intent(MainActivity.this, TeacherInfo.class));
+            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            searchTeacherByUid(uid);
 
 
         } else {
             // User is not authenticated (signed out)
-            startActivity(new Intent(MainActivity.this, SignUp.class));
+            startActivity(new Intent(MainActivity.this, TeacherInfo.class));
 
         }
 
@@ -169,10 +175,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // get logged in user inforamtion from database: --------------------------------------------
-        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        searchTeacherByUid(uid);
 
 
+        //
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -238,9 +243,7 @@ public class MainActivity extends AppCompatActivity {
                         // Handle the found Teacher object
                         if (student != null) {
                             Log.d("YAZAN", "[+] Student found: " + student.getFullname());
-                            // Do something with the teacher object
 
-                            // If you want to return the Teacher object, you can pass it to another function
                             handleFoundStudent(student);
                         }
                     }
@@ -260,18 +263,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleFoundTeacher(Teacher teacher) {
-        teacherUserInfo = teacher;
-        ifTeacher = true;
         autoCityMenu.setText(teacherUserInfo.getCity());
         Log.d("YAZAN", "[+] User is Teacher -------------------------------- ");
+
+        SharedPreferences sharedPreferences = getSharedPreferences("CurrentUser", this.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("isTeacher", false);
+        editor.putString("teacherFullname", teacher.getFullname());
+        //editor.putString("teacherMail", teacher.getMail());
+        editor.putString("teacherCity", teacher.getCity());
+        editor.putString("teacherUid", teacher.getUid());
+        editor.putString("teacherImage", teacher.getImage());
+
+        editor.apply();
     }
 
     private void handleFoundStudent(Student student) {
-        studentUserInfo = student;
-        ifTeacher = false;
         autoCityMenu.setText(studentUserInfo.getCity());
         Log.d("YAZAN", "[+] User is Student -------------------------------- ");
+
+        SharedPreferences sharedPreferences = getSharedPreferences("CurrentUser", this.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("isTeacher", false);
+        editor.putString("studentFullname", student.getFullname());
+        //editor.putString("studentMail", student.getMail());
+        editor.putString("studentCity", student.getCity());
+        editor.putString("studentUid", student.getUid());
+        editor.apply();
+
     }
+
+
+
 
 
     private void setUpRecyclerView() {

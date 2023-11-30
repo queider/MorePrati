@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,11 +28,14 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
  public class ChatActivity extends AppCompatActivity {
+     private String fullnameS;
+
 
      private RecyclerView recyclerView;
      private TextInputLayout messageInputLayout;
@@ -50,11 +54,39 @@ import java.util.List;
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_chat);
-
          // Get user IDs from the intent
 
          currentUserId ="RLLQsDonF6dDUOUdyVWTiupfJNH3"; // should be the user uid
          chatUserId = "1RMAJtD8bfXhrM3oUNBqLXBqUB93"; // should be the chat user uid
+
+         // get teacher info
+         // Assuming you have the teacher's UID
+         String teacherUid = chatUserId;
+
+        // Get a reference to the "Teachers" node in Firebase
+         DatabaseReference teachersRef = FirebaseDatabase.getInstance().getReference().child("Teachers");
+
+        // Query to get the teacher's information based on UID
+         teachersRef.child(teacherUid).addListenerForSingleValueEvent(new ValueEventListener() {
+             @Override
+             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                 if (dataSnapshot.exists()) {
+                     fullnameS = dataSnapshot.child("fullname").getValue(String.class);
+                     EditText fullname = findViewById(R.id.fullname);
+                     fullname.setText(fullnameS);
+                 } else {
+                 }
+             }
+
+             @Override
+             public void onCancelled(@NonNull DatabaseError databaseError) {
+                 // Handle errors
+                 Log.e("TeacherName", "Error getting teacher's information", databaseError.toException());
+             }
+         });
+
+
+
 
          firebaseAuth = FirebaseAuth.getInstance();
          messagesReference = FirebaseDatabase.getInstance().getReference().child("Messages");
