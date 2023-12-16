@@ -1,27 +1,19 @@
 package com.example.moreprati;
 
 public class Message {
-    private String senderId;
+
     private String messageText;
-    private long timestamp; // You can add a timestamp to each message
+    private String sender;
+
 
     // Empty constructor required for Firebase
     public Message() {
         // Default constructor required for Firebase
     }
 
-    public Message(String senderId, String messageText, long timestamp) {
-        this.senderId = senderId;
+    public Message(String messageText, String sender) {
         this.messageText = messageText;
-        this.timestamp = timestamp;
-    }
-
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(String senderId) {
-        this.senderId = senderId;
+        this.sender = sender;
     }
 
     public String getMessageText() {
@@ -32,11 +24,13 @@ public class Message {
         this.messageText = messageText;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public String getSender() {
+        return sender;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setSedner(String sedner) {
+        this.sender = sender;
     }
+
+
 }

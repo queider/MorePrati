@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,14 +22,30 @@ import com.squareup.picasso.Picasso; // Assuming you use Picasso for image loadi
 
 public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdapter.ViewHolder> {
 
-    public TeacherAdapter(@NonNull FirebaseRecyclerOptions<Teacher> options) {
-        super(options);
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Teacher teacher);
     }
+
+
+    public TeacherAdapter(@NonNull FirebaseRecyclerOptions<Teacher> options, OnItemClickListener listener ) {
+        super(options);
+        this.listener = listener;
+
+    }
+
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Teacher model) {
         Log.d("TeacherAdapter", "Binding data for position: " + position);
         holder.bind(model);
+
+        // Set a click listener for the item
+        holder.itemView.setOnClickListener(v -> {
+            // Call the onItemClick method of the listener and pass the clicked teacher
+            listener.onItemClick(model);
+        });
     }
 
 

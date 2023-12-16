@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,7 +32,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,11 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     // User Logging Things -------------------------
-    public Teacher teacherUserInfo;
-    public Student studentUserInfo;
-
-    public boolean ifTeacher;
-
     private String uid;
 
 
@@ -76,11 +74,17 @@ public class MainActivity extends AppCompatActivity {
     private int lastVisibleItem = 0;
 
 
+    // token
+
+
+    private String fcmToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(this);
+        teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
 
 
 
@@ -121,32 +125,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
         // firebase things ------------------------------------------------------
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        if (currentUser != null) {
+        if (currentUser == null) {
             // User is authenticated (signed in)
-            Toast.makeText(this, "User is authenticated", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, SignUp.class));
 
-            startActivity(new Intent(MainActivity.this, TeacherInfo.class));
-            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            searchTeacherByUid(uid);
-
-
-        } else {
-            // User is not authenticated (signed out)
-            startActivity(new Intent(MainActivity.this, TeacherInfo.class));
-
+            //startActivity(new Intent(MainActivity.this, RecentChatsActivity.class));
         }
+        //startActivity(new Intent(MainActivity.this, SignUp.class));
 
+        Toast.makeText(this, "User is authenticated", Toast.LENGTH_SHORT).show();
+
+
+        uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        searchTeacherByUid(uid);
+
+        getFCMToken();
+
+        //if(fcmToken != "") teachersRef.child(uid).child("fcmToken").setValue(fcmToken);
 
         // recycler:
-
-        teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         setUpRecyclerView();
 
         Button searchButton = findViewById(R.id.search_button);
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // get logged in user inforamtion from database: --------------------------------------------
+        // get logged in user information from database: --------------------------------------------
 
 
         //
@@ -182,13 +183,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.action_home && !isCurrentActivity(MainActivity.class)) {
-                    startActivity(new Intent(MainActivity.this, MainActivity.class));
-
-                    Log.d("YAZAN", "[*] NAVBAR: pressed home");
-                    return true;
-                } else if (item.getItemId() == R.id.action_chat && !isCurrentActivity(Login.class)) {
-                    startActivity(new Intent(MainActivity.this, Login.class));
+                 if (item.getItemId() == R.id.action_chat && !isCurrentActivity(RecentChatsActivity.class)) {
+                    startActivity(new Intent(MainActivity.this, RecentChatsActivity.class));
                     Log.d("YAZAN", "[*] NAVBAR: pressed chat");
                     return true;
                 }
@@ -220,7 +216,8 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    Log.d("YAZAN", "Teacher with UID " + uid + " not found");
+                    Log.d("YAZAN", "Teacher with UID " + uid + " not found, searching for student.... ");
+                    searchStudentByUid(uid);
                 }
             }
 
@@ -263,24 +260,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleFoundTeacher(Teacher teacher) {
-        autoCityMenu.setText(teacherUserInfo.getCity());
+        autoCityMenu.setText(teacher.getCity());
         Log.d("YAZAN", "[+] User is Teacher -------------------------------- ");
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentUser", this.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putBoolean("isTeacher", false);
+        editor.putBoolean("isTeacher", true);
         editor.putString("teacherFullname", teacher.getFullname());
-        //editor.putString("teacherMail", teacher.getMail());
         editor.putString("teacherCity", teacher.getCity());
-        editor.putString("teacherUid", teacher.getUid());
+        editor.putString("teacherUID", teacher.getUid());
         editor.putString("teacherImage", teacher.getImage());
+        editor.putString("fcmToken", fcmToken);
 
         editor.apply();
     }
 
     private void handleFoundStudent(Student student) {
-        autoCityMenu.setText(studentUserInfo.getCity());
+        autoCityMenu.setText(student.getCity());
         Log.d("YAZAN", "[+] User is Student -------------------------------- ");
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentUser", this.MODE_PRIVATE);
@@ -288,9 +285,9 @@ public class MainActivity extends AppCompatActivity {
 
         editor.putBoolean("isTeacher", false);
         editor.putString("studentFullname", student.getFullname());
-        //editor.putString("studentMail", student.getMail());
         editor.putString("studentCity", student.getCity());
-        editor.putString("studentUid", student.getUid());
+        editor.putString("studentUID", student.getUid());
+        editor.putString("fcmToken", fcmToken);
         editor.apply();
 
     }
@@ -300,9 +297,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpRecyclerView() {
-
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -314,71 +309,45 @@ public class MainActivity extends AppCompatActivity {
             conditions.add(query.orderByChild("subjects/" + searchSubject).equalTo(true));
         }
 
-
         if (searchCity != null) {
             conditions.add(query.orderByChild("city").equalTo(searchCity));
         }
-
 
         // Apply conditions
         for (Query condition : conditions) {
             query = condition;
         }
 
-        Log.d("TAG", "[*] STARTED SEARCHING: " + "subject " + searchSubject + ", price "  + searchCity + '.');
+        Log.d("TAG", "[*] STARTED SEARCHING: " + "subject " + searchSubject + ", price " + searchCity + '.');
+
+
         FirebaseRecyclerOptions<Teacher> options =
                 new FirebaseRecyclerOptions.Builder<Teacher>()
                         .setQuery(query, Teacher.class)
                         .build();
 
-        Log.d("TAG", "[+] SEARCHING ENDED    -----------------------------------------");
+        teacherAdapter = new TeacherAdapter(options, new TeacherAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Teacher teacher) {
+                // Handle item click, for example, open a new activity
+                Intent intent = new Intent(MainActivity.this, TeacherInfo.class);
+                intent.putExtra("fullname", teacher.getFullname());
+                intent.putExtra("city", teacher.getCity());
+                intent.putExtra("uid", teacher.getUid());
+                intent.putExtra("subjects", (Serializable) teacher.getSubjects());
+                intent.putExtra("wayOfLearning", teacher.getWayOfLearning());
+                intent.putExtra("pricePerHour", teacher.getPricePerHour());
+                intent.putExtra("description", teacher.getDescription());
+                intent.putExtra("imageUrl", teacher.getImage());
+                intent.putExtra("rating", teacher.getRating());
+                intent.putExtra("fcmToken", teacher.getFcmToken());
+                startActivity(intent);
+            }
+        });
 
-        teacherAdapter = new TeacherAdapter(options);
-
-        // Set the adapter to the RecyclerView
         recyclerView.setAdapter(teacherAdapter);
 
-        // Start listening for changes
         teacherAdapter.startListening();
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                        && firstVisibleItemPosition >= 0) {
-                    // End of the list reached, load more items
-                    loadMoreItems();
-                }
-            }
-        });
-
-
-    }
-
-    private void loadMoreItems() {
-        // Update query to fetch the next set of items
-        Query newQuery = teachersRef.orderByChild("yourOrderByField")
-                .startAfter(lastVisibleItem)
-                .limitToFirst(PAGE_SIZE);
-
-        newQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Process the new data and update the lastVisibleItem
-                // Add the new data to your adapter or dataset
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle errors
-            }
-        });
     }
 
 
@@ -395,6 +364,16 @@ public class MainActivity extends AppCompatActivity {
         if (teacherAdapter != null) {
             teacherAdapter.stopListening();
         }
+    }
+
+
+     void getFCMToken(){
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                fcmToken = task.getResult();
+                Log.d("YAZAN", "getFCMToken: " + fcmToken);
+            }
+        });
     }
 
 }

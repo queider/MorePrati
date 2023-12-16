@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -76,6 +77,7 @@ public class SignUpTeacher extends AppCompatActivity {
     private String description;
 
     private String uid;
+    private String fcmToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,16 +237,40 @@ public class SignUpTeacher extends AppCompatActivity {
                 });
     }
     // Adding the student to the db -----------------------------------------------------------
+
+
     private void linkUserToDatabase() {
-        Teacher teacher = new Teacher( fullname,  mail,  city,  uid , subjectMap,  wayOfLearningString , pricePerHour,  description,  profilePicUri);
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
-        String userKey = usersRef.push().getKey();
-        usersRef.child(userKey).setValue(teacher);
-        Log.d(TAG, "linkUserToDatabase: Registers teacher");
-        goToMainActivity();
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                fcmToken = task.getResult();
+                Log.d("YAZAN", "getFCMToken (SignUPTeacher): " + fcmToken);
+
+                // Now that you have the token, proceed with linking the user to the database
+                proceedWithLinking();
+            } else {
+                Log.e("YAZAN", "Error getting FCM token: " + task.getException());
+                // Handle the error if needed
+            }
+        });
     }
 
-    private void goToMainActivity(){
+    private void proceedWithLinking() {
+        // Continue with linking the user to the database
+        Teacher teacher = new Teacher(fullname, mail, city, uid, subjectMap, wayOfLearningString, pricePerHour, description, profilePicUri, fcmToken);
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
+        usersRef.child(uid).setValue(teacher)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "linkUserToDatabase: Registers teacher");
+                        goToMainActivity();
+                    } else {
+                        Log.w(TAG, "linkUserToDatabase: Failure", task.getException());
+                        // Handle the error here (e.g., show an error message)
+                    }
+                });
+    }
+
+    void goToMainActivity() {
         startActivity(new Intent(SignUpTeacher.this, MainActivity.class));
     }
     private boolean validation() {

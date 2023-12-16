@@ -18,13 +18,14 @@ public class Teacher {
     private String image;
 
     private int rating;
+    private String fcmToken;
 
     // Default constructor required for Firebase
     public Teacher() {
     }
 
     public Teacher(String fullname, String mail, String city, String uid, Map<String, Boolean> subjects,
-                   String wayOfLearning, int pricePerHour, String description, String image) {
+                   String wayOfLearning, int pricePerHour, String description, String image,String fcmToken) {
         this.fullname = fullname;
         this.mail = mail;
         this.city = city;
@@ -35,6 +36,7 @@ public class Teacher {
         this.description = description;
         this.image = image;
         this.rating = 0;
+        this.fcmToken = fcmToken;
     }
 
     // Getters and setters for all properties
@@ -117,5 +119,13 @@ public class Teacher {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

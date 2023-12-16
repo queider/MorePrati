@@ -7,6 +7,8 @@ public class Student {
     private String city;
     private String uid;
 
+    // add image
+
     // Default constructor required for DataSnapshot.getValue(User.class)
     public Student() {}
     public Student (String fullname, String mail, String city, String uid) {
