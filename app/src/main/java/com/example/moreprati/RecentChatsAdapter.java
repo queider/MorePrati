@@ -16,8 +16,25 @@ import com.squareup.picasso.Picasso;
 
 public class RecentChatsAdapter extends FirebaseRecyclerAdapter<RecentChats, RecentChatsAdapter.RecentChatsViewHolder> {
     private RecentChatsAdapter.OnItemClickListener listener;
+
+
     public interface OnItemClickListener {
         void onItemClick(String chatUserId);  // Pass any necessary data for the new activity
+    }
+    @Override
+    public void onDataChanged() {
+        super.onDataChanged();
+        // This method will be called when there are changes in the data
+        // You can perform additional tasks if needed
+
+        // For example, you can log a message
+        Log.d("YAZAN", "onDataChanged: Data set changed");
+
+        // Or you can update UI, show/hide views, etc.
+        // For instance, you might want to display a message when there are no items
+        if (getItemCount() == 0) {
+            // Handle the case when there are no items
+        }
     }
 
     public RecentChatsAdapter(@NonNull FirebaseRecyclerOptions<RecentChats> options, OnItemClickListener listener) {
@@ -39,7 +56,7 @@ public class RecentChatsAdapter extends FirebaseRecyclerAdapter<RecentChats, Rec
     protected void onBindViewHolder(@NonNull RecentChatsViewHolder holder, int position, @NonNull RecentChats model) {
         Log.d("YAZAN", "onBindViewHolder for position: " + position);
 
-        if (model != null) {
+        if (position >= 0 && model != null) {
             holder.chatUserName.setText(model.getFullname());
             holder.lastMessage.setText(model.getLastMessage());
             Picasso.get()
@@ -54,6 +71,7 @@ public class RecentChatsAdapter extends FirebaseRecyclerAdapter<RecentChats, Rec
             });
         }
     }
+
 
 
     public static class RecentChatsViewHolder extends RecyclerView.ViewHolder {

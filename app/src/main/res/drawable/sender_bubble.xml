@@ -1,0 +1,5 @@
+<!-- res/drawable/sender_bubble.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:radius="8dp" />
+    <solid android:color="#2196F3" /> <!-- Blue color for sender -->
+</shape>

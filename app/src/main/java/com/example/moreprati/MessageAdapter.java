@@ -13,8 +13,10 @@ import java.util.List;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private List<Message> messages;
+    private String currentUserId;
 
-    public MessageAdapter(List<Message> messages) {
+    public MessageAdapter(List<Message> messages, String currentUserId) {
+        this.currentUserId = currentUserId;
         this.messages = messages;
     }
 
@@ -28,7 +30,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
         Message message = messages.get(position);
-        holder.bind(message);
+        holder.bind(message, currentUserId);
     }
 
     @Override
@@ -36,7 +38,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return messages.size();
     }
 
-    public static class MessageViewHolder extends RecyclerView.ViewHolder {
+    public class MessageViewHolder extends RecyclerView.ViewHolder {
         private TextView messageTextView;
 
         public MessageViewHolder(@NonNull View itemView) {
@@ -44,8 +46,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageTextView = itemView.findViewById(R.id.messageTextView);
         }
 
-        public void bind(Message message) {
+        public void bind(Message message, String currentUserId) {
             messageTextView.setText(message.getMessageText());
+
+            // Set background based on the sender's UID
+            String senderUid = message.getSender();
+            if (senderUid.equals(currentUserId)) {
+                messageTextView.setBackgroundResource(R.drawable.receiver_bubble);
+                // Set other properties for the sender's bubble
+            } else {
+                messageTextView.setBackgroundResource(R.drawable.sender_bubble);
+                // Set other properties for the receiver's bubble
+            }
         }
     }
 }

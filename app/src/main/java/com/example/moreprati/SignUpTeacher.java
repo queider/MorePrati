@@ -27,8 +27,10 @@ import android.widget.Toast;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -202,10 +204,11 @@ public class SignUpTeacher extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Uri uri = data.getData();
-        profilePic.setImageURI(uri);
-        profilePicLocalUri = uri;
-
+        if (resultCode == RESULT_OK && requestCode == ImagePicker.REQUEST_CODE) {
+            Uri uri = data.getData();
+            profilePic.setImageURI(uri);
+            profilePicLocalUri = uri;
+        }
     }
 
 
@@ -213,8 +216,7 @@ public class SignUpTeacher extends AppCompatActivity {
         Log.d(TAG, "registerTeacher: " + mail);
         Log.d(TAG, "registerTeacher: " + password);
 
-
-    mAuth.createUserWithEmailAndPassword(mail, password)
+        mAuth.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -223,10 +225,9 @@ public class SignUpTeacher extends AppCompatActivity {
                             Log.d(TAG, "createUserWithEmail:success");
                             Toast.makeText(SignUpTeacher.this, "ההרשמה בוצעה בהצלחה",
                                     Toast.LENGTH_SHORT).show();
-
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            uid = user.getUid();
-                            uploadProfilePicToStorage(profilePicLocalUri);
+                            uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                            // Reauthenticate the user before uploading the profile picture
+                            reauthenticateUser(mail, password);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -236,6 +237,7 @@ public class SignUpTeacher extends AppCompatActivity {
                     }
                 });
     }
+
     // Adding the student to the db -----------------------------------------------------------
 
 
@@ -244,18 +246,14 @@ public class SignUpTeacher extends AppCompatActivity {
             if (task.isSuccessful()) {
                 fcmToken = task.getResult();
                 Log.d("YAZAN", "getFCMToken (SignUPTeacher): " + fcmToken);
-
-                // Now that you have the token, proceed with linking the user to the database
                 proceedWithLinking();
             } else {
                 Log.e("YAZAN", "Error getting FCM token: " + task.getException());
-                // Handle the error if needed
             }
         });
     }
 
     private void proceedWithLinking() {
-        // Continue with linking the user to the database
         Teacher teacher = new Teacher(fullname, mail, city, uid, subjectMap, wayOfLearningString, pricePerHour, description, profilePicUri, fcmToken);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         usersRef.child(uid).setValue(teacher)
@@ -265,7 +263,7 @@ public class SignUpTeacher extends AppCompatActivity {
                         goToMainActivity();
                     } else {
                         Log.w(TAG, "linkUserToDatabase: Failure", task.getException());
-                        // Handle the error here (e.g., show an error message)
+                        Toast.makeText(SignUpTeacher.this, "Failed to register teacher", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -315,27 +313,42 @@ public class SignUpTeacher extends AppCompatActivity {
         return true;
     }
     private void uploadProfilePicToStorage(Uri imageUri) {
-        // Get a reference to the storage location
         StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("profile_pics/" + System.currentTimeMillis() + ".jpg");
 
-        // Upload the image
         storageRef.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
-                    // Image uploaded successfully
                     storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                        // Get the download URL and store it in your class variable or wherever you need it
                         profilePicUri =  uri.toString();
-                        Log.d("uploadProfilePicToStorage: ", "File is uplouded and uri is: " + profilePicUri);
-                        linkUserToDatabase();
-                        // Perform any actions that depend on the download URL here
-
+                        Log.d("uploadProfilePicToStorage: ", "File is uploaded, uri: " + profilePicUri);
+                        linkUserToDatabase(); // Link user to the database after image upload success
                     });
                 })
                 .addOnFailureListener(e -> {
-                    // Handle unsuccessful upload
-                    Log.d(TAG, "uploadProfilePicToStorage: FAIL");
-                    e.printStackTrace();
+                    Log.e(TAG, "uploadProfilePicToStorage: FAIL", e);
+                    Toast.makeText(this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
+                    // Handle other failure cases or provide meaningful error messages
                 });
     }
+    private void reauthenticateUser(String email, String password) {
+        AuthCredential credential = EmailAuthProvider.getCredential(email, password);
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if (user != null) {
+            user.reauthenticate(credential)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            // User has been reauthenticated successfully
+                            Log.d(TAG, "reauthenticateUser: success");
+                            uploadProfilePicToStorage(profilePicLocalUri);
+                        } else {
+                            // Reauthentication failed
+                            Log.w(TAG, "reauthenticateUser: failure", task.getException());
+                            Toast.makeText(SignUpTeacher.this, "Reauthentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
 
 }

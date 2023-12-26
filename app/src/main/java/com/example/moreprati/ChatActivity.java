@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64InputStream;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -98,9 +99,11 @@ import okhttp3.Response;
          Intent intent = getIntent();
 
 
+         currentUserId = sharedPreferences.getString("uid", "");
+
          if (intent.getBooleanExtra("cameFromTeacherInfo", false)) {
 
-                 //Teacher To Teacher
+
              chatUserId = intent.getStringExtra("uid");
              imageUrl = intent.getStringExtra("imageUrl");
              fullname = intent.getStringExtra(("fullname"));
@@ -108,38 +111,26 @@ import okhttp3.Response;
              isTeacher = intent.getBooleanExtra("isTeacher", true);
              textView.setText(fullname);
              Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
-             currentUserId = sharedPreferences.getString("teacherUID", "");
+
 
                 //my info
-             messagesReference.child(chatUserId).child(currentUserId).child("lastMessage").setValue("");
-             messagesReference.child(chatUserId).child(currentUserId).child("fullname").setValue(sharedPreferences.getString("teacherFullname", ""));
+             messagesReference.child(chatUserId).child(currentUserId).child("fullname").setValue(sharedPreferences.getString("fullname", ""));
              messagesReference.child(chatUserId).child(currentUserId).child("isTeacher").setValue(sharedPreferences.getBoolean("isTeacher", true));
-             messagesReference.child(chatUserId).child(currentUserId).child("imageUrl").setValue(sharedPreferences.getString("teacherImage", ""));
              messagesReference.child(chatUserId).child(currentUserId).child("fcmToken").setValue(sharedPreferences.getString("fcmToken", ""));
              messagesReference.child(chatUserId).child(currentUserId).child("chatUserId").setValue(currentUserId);
 
+
+             if (sharedPreferences.getBoolean("isTeacher", true)) {
+                 messagesReference.child(chatUserId).child(currentUserId).child("imageUrl").setValue(sharedPreferences.getString("image", ""));
+             }
                  //chat user info
-             messagesReference.child(currentUserId).child(chatUserId).child("lastMessage").setValue("");
              messagesReference.child(currentUserId).child(chatUserId).child("fullname").setValue(fullname);
              messagesReference.child(currentUserId).child(chatUserId).child("isTeacher").setValue(isTeacher);
              messagesReference.child(currentUserId).child(chatUserId).child("imageUrl").setValue(imageUrl);
              messagesReference.child(currentUserId).child(chatUserId).child("fcmToken").setValue(ChatToken);
              messagesReference.child(currentUserId).child(chatUserId).child("chatUserId").setValue(chatUserId);
 
-
-
-
-
-
-
          } else {
-
-             if (sharedPreferences.getBoolean("isTeacher", true)) {
-                 currentUserId = sharedPreferences.getString("teacherUID", "");
-             } else {
-                 currentUserId = sharedPreferences.getString("StudentUID", "");
-             }
-
              Intent intentFromRC = getIntent();
              chatUserId = intent.getStringExtra("chatUserIdFromRecentChats");
 
@@ -149,19 +140,22 @@ import okhttp3.Response;
              messagesReference.child(currentUserId).child(chatUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                  @Override
                  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                     fullname = dataSnapshot.child("fullname").getValue(String.class);
-                     imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
                      isTeacher = dataSnapshot.child("isTeacher").getValue(boolean.class);
+                     if(isTeacher){
+                         imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
+                     }
+                     fullname = dataSnapshot.child("fullname").getValue(String.class);
                      ChatToken = dataSnapshot.child("fcmToken").getValue(String.class);
+                     Log.d("Yazan", "onDataChange: FullNAME IS " + fullname);
+                     textView.setText(fullname);
+                     Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
                  }
                  @Override
                  public void onCancelled(@NonNull DatabaseError databaseError) {
 
                  }
              });
-             textView.setText(fullname);
-             Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
+             Log.d("Yazan", "onDataChange: FullNAME IS 2" + fullname);
          }
 
 
@@ -175,7 +169,7 @@ import okhttp3.Response;
 
          sendButton = findViewById(R.id.sendButton);
 
-         messageAdapter = new MessageAdapter(messagesList);
+         messageAdapter = new MessageAdapter(messagesList, currentUserId);
          recyclerView.setLayoutManager(new LinearLayoutManager(this));
          recyclerView.setAdapter(messageAdapter);
 
@@ -201,7 +195,18 @@ import okhttp3.Response;
                  sendButton.setEnabled(!editable.toString().trim().isEmpty());
              }
          });
+
+
      }
+
+     @Override
+     public void onBackPressed() {
+         super.onBackPressed();
+         finish();
+     }
+
+
+
 
      private void loadMessages() {
 
@@ -244,7 +249,7 @@ import okhttp3.Response;
 
          if (!messageText.isEmpty()) {
 
-             Message message = new Message(messageText, currentUserId);
+             Message message = new Message(messageText, currentUserId, chatUserId);
 
 
              messagesReference.child(currentUserId).child(chatUserId).child("Messages").push().setValue(message);

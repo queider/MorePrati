@@ -17,7 +17,9 @@ public class Teacher {
     private String description;
     private String image;
 
-    private int rating;
+    private float rating;
+    private int howManyRated;
+
     private String fcmToken;
 
     // Default constructor required for Firebase
@@ -113,11 +115,11 @@ public class Teacher {
         this.image = image;
     }
 
-    public int getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(int rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 
@@ -127,5 +129,12 @@ public class Teacher {
 
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public int  getHowManyRated() {
+        return howManyRated;
+    }
+    public void setHowManyRated(int howManyRated) {
+        this.howManyRated = howManyRated;
     }
 }

@@ -1,16 +1,18 @@
 package com.example.moreprati;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -21,8 +23,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.Map;
-public class TeacherInfo extends AppCompatActivity {
+
+public class TeacherInfoFragment extends Fragment {
 
     private String fullname;
     private String city;
@@ -36,37 +40,33 @@ public class TeacherInfo extends AppCompatActivity {
     private String fcmToken;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_teacher_info);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_teacher_info, container, false);
 
-        // Retrieve values from Intent
-        Intent intent = getIntent();
-        fullname = intent.getStringExtra("fullname");
-        city = intent.getStringExtra("city");
-        uid = intent.getStringExtra("uid");
-
-        // Retrieve subjects using Serializable
-        subjects = (Map<String, Boolean>) intent.getSerializableExtra("subjects");
-
-        wayOfLearning = intent.getStringExtra("wayOfLearning");
-        pricePerHour = intent.getIntExtra("pricePerHour", 0);
-        description = intent.getStringExtra("description");
-        imageUrl = intent.getStringExtra("imageUrl");
-        rating = intent.getIntExtra("rating", 0);
-        fcmToken = intent.getStringExtra("fcmToken");
-
+        Bundle args = getArguments();
+        if (args != null) {
+            fullname = args.getString("fullname");
+            city = args.getString("city");
+            uid = args.getString("uid");
+            subjects = (Map<String, Boolean>) args.getSerializable("subjects");
+            wayOfLearning = args.getString("wayOfLearning");
+            pricePerHour = args.getInt("pricePerHour", 0);
+            description = args.getString("description");
+            imageUrl = args.getString("imageUrl");
+            rating = args.getInt("rating", 0);
+            fcmToken = args.getString("fcmToken");
+        }
 
         // Set values to views
-        ImageView profileImageView = findViewById(R.id.profilePic);
-        TextView fullnameTextView = findViewById(R.id.fullname);
-        TextView ratingTextView = findViewById(R.id.rating);
-        TextView wayOfLearningTextView = findViewById(R.id.wayOfLearning);
-        TextView pricePerHourTextView = findViewById(R.id.pricePerHour);
-        TextView cityTextView = findViewById(R.id.city);
-        TextView subjectsTextView = findViewById(R.id.subjects);
-        TextView descriptionEditText = findViewById(R.id.description);
-        RatingBar ratingBar = findViewById(R.id.ratingBar);
+        ImageView profileImageView = view.findViewById(R.id.profilePic);
+        TextView fullnameTextView = view.findViewById(R.id.fullname);
+        TextView ratingTextView = view.findViewById(R.id.rating);
+        TextView wayOfLearningTextView = view.findViewById(R.id.wayOfLearning);
+        TextView pricePerHourTextView = view.findViewById(R.id.pricePerHour);
+        TextView cityTextView = view.findViewById(R.id.city);
+        TextView subjectsTextView = view.findViewById(R.id.subjects);
+        TextView descriptionEditText = view.findViewById(R.id.description);
+        RatingBar ratingBar = view.findViewById(R.id.ratingBar);
 
         // Load image using Picasso
         Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(profileImageView);
@@ -93,13 +93,12 @@ public class TeacherInfo extends AppCompatActivity {
         // Set description to EditText
         descriptionEditText.setText(description);
 
-
-        Button makeContact = findViewById(R.id.contact);
+        Button makeContact = view.findViewById(R.id.contact);
 
         makeContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(TeacherInfo.this, ChatActivity.class);
+                Intent intent = new Intent(requireContext(), ChatActivity.class);
                 intent.putExtra("fullname", fullname);
                 intent.putExtra("uid", uid);
                 intent.putExtra("imageUrl", imageUrl);
@@ -107,8 +106,8 @@ public class TeacherInfo extends AppCompatActivity {
                 intent.putExtra("cameFromTeacherInfo", true);
                 startActivity(intent);
             }
-        });
 
+        });
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -159,8 +158,10 @@ public class TeacherInfo extends AppCompatActivity {
 
             }
         });
+        return view;
     }
 
+    // Additional methods or overrides can be added as needed
     private float calculateNewRating(float currentRating, int howManyRated, float userRating) {
         // Your logic to calculate the new rating based on the current rating,
         // number of ratings, and the user's new rating

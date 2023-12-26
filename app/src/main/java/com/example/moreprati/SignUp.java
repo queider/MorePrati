@@ -30,7 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 public class SignUp extends AppCompatActivity {
     private FirebaseAuth mAuth; // firebase thing
-
+    private String uid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,8 +133,7 @@ public class SignUp extends AppCompatActivity {
                             Toast.makeText(SignUp.this, "ההרשמה בוצעה בהצלחה",
                                     Toast.LENGTH_SHORT).show();
 
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            String uid = user.getUid();
+                            uid = mAuth.getCurrentUser().getUid();
 
                             // Now you can link the user to additional information in the database
                             linkUserToDatabase(fullname, mail, city, uid);
@@ -155,7 +154,7 @@ public class SignUp extends AppCompatActivity {
         Student student = new Student(fullname, mail, city, uid);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Students");
         String userKey = usersRef.push().getKey();
-        usersRef.child(userKey).setValue(student);
+        usersRef.child(userKey).child(uid).setValue(student);
         Log.d(TAG, "linkUserToDatabase: DONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
     }
 
