@@ -1,6 +1,5 @@
-package com.example.moreprati;
+package com.example.moreprati.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,12 +15,13 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
+import com.example.moreprati.R;
+import com.example.moreprati.objects.Teacher;
+import com.example.moreprati.adapters.TeacherAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 
 import java.io.Serializable;

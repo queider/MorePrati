@@ -1,4 +1,4 @@
-package com.example.moreprati;
+package com.example.moreprati.objects;
 
 import java.util.Map;
 

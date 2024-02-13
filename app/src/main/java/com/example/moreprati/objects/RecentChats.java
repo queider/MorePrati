@@ -1,4 +1,4 @@
-package com.example.moreprati;
+package com.example.moreprati.objects;
 public class RecentChats {
     private String fullname;
     private String imageUrl;

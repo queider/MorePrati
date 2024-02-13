@@ -1,4 +1,4 @@
-package com.example.moreprati;// MessageAdapter.java
+package com.example.moreprati.adapters;// MessageAdapter.java
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.moreprati.objects.Message;
+import com.example.moreprati.R;
 
 import java.util.List;
 
