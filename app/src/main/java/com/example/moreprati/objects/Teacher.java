@@ -9,6 +9,7 @@ public class Teacher {
     private String uid;
 
     private Map<String, Boolean> subjects;
+    private Map<String, Boolean> citySubjects;
 
     private String wayOfLearning; // ether online, face to face or both
 
@@ -26,13 +27,14 @@ public class Teacher {
     public Teacher() {
     }
 
-    public Teacher(String fullname, String mail, String city, String uid, Map<String, Boolean> subjects,
+    public Teacher(String fullname, String mail, String city, String uid, Map<String, Boolean> subjects, Map<String, Boolean> citySubjects,
                    String wayOfLearning, int pricePerHour, String description, String image,String fcmToken) {
         this.fullname = fullname;
         this.mail = mail;
         this.city = city;
         this.uid = uid;
         this.subjects = subjects;
+        this.citySubjects = citySubjects;
         this.wayOfLearning = wayOfLearning;
         this.pricePerHour = pricePerHour;
         this.description = description;
@@ -82,6 +84,17 @@ public class Teacher {
     public void setSubjects(Map<String, Boolean> subjects) {
         this.subjects = subjects;
     }
+
+
+    public Map<String, Boolean> getCitySubjects() {
+        return citySubjects;
+    }
+
+    public void setCitySubjects(Map<String, Boolean> citySubjects) {
+        this.citySubjects = citySubjects;
+    }
+
+
 
     public String getWayOfLearning() {
         return wayOfLearning;
@@ -137,4 +150,6 @@ public class Teacher {
     public void setHowManyRated(int howManyRated) {
         this.howManyRated = howManyRated;
     }
+
+
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.SignUp"
+    tools:context=".fragments.SignUpStudentFragment"
     android:padding="150px"
     >
 
@@ -44,19 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="הרשם בתור תלמיד"
-        />
-    <Button
-        android:id="@+id/loginAsATeacher"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="הרשם בתור מורה"
-        />
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="כבר רשום התחבר"
         />
 
 

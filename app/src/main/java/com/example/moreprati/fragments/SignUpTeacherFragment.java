@@ -1,15 +1,21 @@
-package com.example.moreprati.activities;
+package com.example.moreprati.fragments;
 
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -22,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.moreprati.R;
 import com.example.moreprati.SubjectMapper;
+import com.example.moreprati.activities.MainActivity;
 import com.example.moreprati.objects.Teacher;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,10 +50,12 @@ import com.google.firebase.storage.StorageReference;
 import java.util.Map;
 
 
-public class SignUpTeacher extends AppCompatActivity {
+public class SignUpTeacherFragment extends Fragment {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance(); // firebase thing
     SubjectMapper subjectMapper = new SubjectMapper();
     Map<String, Boolean> subjectMap;
+
+    Map<String, Boolean> CitySubjectMap;
     private MultiAutoCompleteTextView multiAutoCompleteTextView;
 
 
@@ -73,22 +82,22 @@ public class SignUpTeacher extends AppCompatActivity {
     private String uid;
     private String fcmToken;
 
+    @SuppressLint("MissingInflatedId")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up_teacher);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_sign_up_teacher, container, false);
 
 
         //camara -----------------------------------------------------------------------------------
 
-        profilePic = findViewById(R.id.profilePic);
-        cameraButton = findViewById(R.id.cameraButton);
+        profilePic = view.findViewById(R.id.profilePic);
+        cameraButton = view.findViewById(R.id.cameraButton);
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                ImagePicker.with(SignUpTeacher.this)
+                ImagePicker.with(SignUpTeacherFragment.this)
                         .crop(1f, 1f)                    //Crop image(Optional), Check Customization for more option
                         .compress(1024)            //Final image size will be less than 1 MB(Optional)
                         .maxResultSize(1080, 1080)    //Final image resolution will be less than 1080 x 1080(Optional)
@@ -98,79 +107,73 @@ public class SignUpTeacher extends AppCompatActivity {
 
         // Get info from signup ------------------------------------------------
 
-        Intent intent = getIntent();
-         fullname = intent.getStringExtra("fullname");
-         mail = intent.getStringExtra("mail");
-         password = intent.getStringExtra("password");
-         city = intent.getStringExtra("city");
+        //auto complete cities menu
+        Resources res = getResources();
+        String[] cities = res.getStringArray(R.array.cites);
+        AutoCompleteTextView cityMenu = view.findViewById(R.id.cityMenu);
+        ArrayAdapter<String> adapterCity = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cities);
+        cityMenu.setAdapter(adapterCity);
+
+        // Register buttons
 
 
-        // Displays the full name ------------------------------------------------------------------
-        TextView fullnameDisplay = findViewById(R.id.fullname);
-        fullnameDisplay.setText(fullname);
+
+
 
         // subjects setups -------------------------------------------------------
 
-        multiAutoCompleteTextView = findViewById(R.id.subjects);
-        String[] suggestions = new String[]{"מתמטיקה", "עברית", "אנגלית", "גיטרה", "פסנטר"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, suggestions);
-        multiAutoCompleteTextView.setAdapter(adapter);
+        multiAutoCompleteTextView = view.findViewById(R.id.subjects);
+        String[] suggestions = new String[]{"מתמטיקה", "עברית", "אנגלית", "גיטרה", "פסנתר"};
+        ArrayAdapter<String> adapterSubjects = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions);
+        multiAutoCompleteTextView.setAdapter(adapterSubjects);
         multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
 
-
         // Setup AutoCompleteTextView wayOfLearning --------------------------------------------------
-        AutoCompleteTextView wayOfLearning = findViewById(R.id.wayOfLearning);
-
+        AutoCompleteTextView wayOfLearning = view.findViewById(R.id.wayOfLearning);
         String[] suggestionsWayOfLearning = new String[]{"פרונטלי", "מרוחק", "מרוחק ופרונטלי"};
-        ArrayAdapter<String> adapterWayOfLearning = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, suggestionsWayOfLearning);
-
+        ArrayAdapter<String> adapterWayOfLearning = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestionsWayOfLearning);
         wayOfLearning.setAdapter(adapterWayOfLearning);
 
         // Signup button ----------------------------------------------------------------------------
-        Button SignupButton = findViewById(R.id.signUp);
-
+        Button SignupButton = view.findViewById(R.id.signUp);
         SignupButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 // Get the selected values from the MultiAutoCompleteTextView
                 String text = multiAutoCompleteTextView.getText().toString();
-                pricePerHour = Integer.parseInt(((EditText) findViewById(R.id.pricePerHour)).getText().toString());
-                description = ((EditText) findViewById(R.id.description)).getText().toString();
+                pricePerHour = Integer.parseInt(((EditText) view.findViewById(R.id.pricePerHour)).getText().toString());
+                description = ((EditText) view.findViewById(R.id.description)).getText().toString();
                 wayOfLearningString = wayOfLearning.getText().toString();
+                fullname = ((EditText) view.findViewById(R.id.fullname)).getText().toString();
+                mail = ((EditText) view.findViewById(R.id.mail)).getText().toString();
+                password = ((EditText) view.findViewById(R.id.password)).getText().toString();
+                city = cityMenu.getText().toString();
 
                 if (!text.isEmpty()) {
                     subjects = processString(text);
-                    for (int i = 0; i < subjects.length; i++) {
-                        Log.d(TAG, "subject " + i + ": " + subjects[i]);
-                    }
-
                     subjectMap = SubjectMapper.mapSubjects(subjects);
 
                     // log the values of the map
                     for (Map.Entry<String, Boolean> entry : subjectMap.entrySet()) {
-                        Log.d("YAZAN", "SubjectMap " +entry.getKey() + ": " + entry.getValue());
+                        Log.d("YAZAN", "SubjectMap " + entry.getKey() + ": " + entry.getValue());
+
                     }
+
+                    CitySubjectMap = SubjectMapper.mapCitySubjects(subjects, city);
                 }
+
+
                 if (validation()) {
                     registerTeacher();
                 }
-
             }
         });
 
-        // back -----------------
-        Button back = findViewById(R.id.back);
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Call the function to navigate to the second activity
-                goToSignUpActivity();
-
-            }
-        });
-
+        return view;
     }
+
+
 
     private String[] processString(String input) {
         // Remove commas
@@ -182,52 +185,48 @@ public class SignUpTeacher extends AppCompatActivity {
         return wordsArray;
     }
 
-    private void goToSignUpActivity() {
-        // Create an Intent to start the SignUp activity
-        Intent intent = new Intent(this, SignUp.class);
-
-        // Start the SignUp activity
-        startActivity(intent);
-    }
-
 
 
     // camara and profile pic -------------------------------------------------------------------------------------
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == ImagePicker.REQUEST_CODE) {
-            Uri uri = data.getData();
-            profilePic.setImageURI(uri);
-            profilePicLocalUri = uri;
+        if (resultCode == Activity.RESULT_OK && requestCode == ImagePicker.REQUEST_CODE) {
+            if (data != null) {
+                Uri uri = data.getData();
+                if (uri != null) {
+                    profilePic.setImageURI(uri);
+                    profilePicLocalUri = uri;
+                }
+            }
         }
     }
 
 
+
     private void registerTeacher() {
-        Log.d(TAG, "registerTeacher: " + mail);
-        Log.d(TAG, "registerTeacher: " + password);
+        Log.d("YAZAN", "registerTeacher: " + mail);
+        Log.d("YAZAn", "registerTeacher: " + password);
 
         mAuth.createUserWithEmailAndPassword(mail, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            Toast.makeText(SignUpTeacher.this, "ההרשמה בוצעה בהצלחה",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "ההרשמה בוצעה בהצלחה", Toast.LENGTH_SHORT).show();
                             uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                             // Reauthenticate the user before uploading the profile picture
                             reauthenticateUser(mail, password);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignUpTeacher.this, "ההרשמה כשלה / משתמש קיים",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "ההרשמה כשלה / משתמש קיים", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+
     }
 
     // Adding the student to the db -----------------------------------------------------------
@@ -246,7 +245,7 @@ public class SignUpTeacher extends AppCompatActivity {
     }
 
     private void proceedWithLinking() {
-        Teacher teacher = new Teacher(fullname, mail, city, uid, subjectMap, wayOfLearningString, pricePerHour, description, profilePicUri, fcmToken);
+        Teacher teacher = new Teacher(fullname, mail, city, uid, subjectMap, CitySubjectMap,wayOfLearningString, pricePerHour, description, profilePicUri, fcmToken);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         usersRef.child(uid).setValue(teacher)
                 .addOnCompleteListener(task -> {
@@ -255,13 +254,12 @@ public class SignUpTeacher extends AppCompatActivity {
                         goToMainActivity();
                     } else {
                         Log.w(TAG, "linkUserToDatabase: Failure", task.getException());
-                        Toast.makeText(SignUpTeacher.this, "Failed to register teacher", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
     void goToMainActivity() {
-        startActivity(new Intent(SignUpTeacher.this, MainActivity.class));
+        //startActivity(new Intent(SignUpTeacherFragment.this, MainActivity.class));
     }
     private boolean validation() {
         // checks if all fields are entered.
@@ -317,7 +315,6 @@ public class SignUpTeacher extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "uploadProfilePicToStorage: FAIL", e);
-                    Toast.makeText(this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
                     // Handle other failure cases or provide meaningful error messages
                 });
     }
@@ -335,8 +332,7 @@ public class SignUpTeacher extends AppCompatActivity {
                         } else {
                             // Reauthentication failed
                             Log.w(TAG, "reauthenticateUser: failure", task.getException());
-                            Toast.makeText(SignUpTeacher.this, "Reauthentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+
                         }
                     });
         }

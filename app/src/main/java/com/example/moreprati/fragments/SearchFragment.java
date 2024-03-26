@@ -37,7 +37,7 @@ public class SearchFragment extends Fragment {
 
 
     String[] cities;
-    String[] subjects = {"מתמטיקה", "עברית", "גיטרה", "אנגלית"};
+    String[] subjects = {"מתמטיקה", "עברית", "גיטרה", "אנגלית" , "פסנתר"};
 
     AutoCompleteTextView autoSubjectsMenu;
     AutoCompleteTextView autoCityMenu;
@@ -61,7 +61,7 @@ public class SearchFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
 
 
-        setUpRecyclerView();// <--- here it works fine
+        setUpRecyclerView();
 
         //search menu
         cities = getResources().getStringArray(R.array.cites);
@@ -120,22 +120,29 @@ public class SearchFragment extends Fragment {
 
         Query query = teachersRef;
 
-        List<Query> conditions = new ArrayList<>();
 
-        if (searchSubject != null) {
-            conditions.add(query.orderByChild("subjects/" + searchSubject).equalTo(true));
+        if (searchSubject != null && searchCity == null) {
+            query = query.orderByChild("subjects/" + searchSubject).equalTo(true);
+            Log.d("Yazan", "[*] 1 Search: searching for " + searchSubject + " & null city");
         }
 
-        if (searchCity != null) {
-            conditions.add(query.orderByChild("city").equalTo(searchCity));
+        if (searchSubject == null && searchCity != null) {
+            query = query.orderByChild("city").equalTo(searchCity);
+            Log.d("Yazan", "[*] 2 Search: searching for null subject & " + searchCity);
+        }
+
+        if (searchSubject != null && searchCity != null) {
+            query = query.orderByChild("citySubjects/" + searchCity + "_" + searchSubject).equalTo(true);
+            Log.d("Yazan", "[*] 3  Search: searching for "+ searchCity + "_" + searchSubject);
+        }
+
+        if (searchSubject == null && searchCity == null) {
+            Log.d("Yazan", "[*] 4 Search: not searching");
         }
 
         // Apply conditions
-        for (Query condition : conditions) {
-            query = condition;
-        }
 
-        Log.d("TAG", "[*] STARTED SEARCHING: " + "subject " + searchSubject + ", price " + searchCity + '.');
+        Log.d("TAG", "[*] STARTED SEARCHING: " + "subject " + searchSubject + ", city " + searchCity + '.');
 
 
         FirebaseRecyclerOptions<Teacher> options =

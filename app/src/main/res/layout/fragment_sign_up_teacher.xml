@@ -1,11 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activities.SignUpTeacher">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/profilePic"
@@ -14,41 +10,66 @@
         android:clickable="true"
         android:onClick="onImageViewClick"
         android:src="@drawable/default_profile_pic" />
+
     <Button
         android:id="@+id/cameraButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Take a Photo" />
-    <TextView
-        android:id="@+id/fullname"
+
+
+    <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="azan asdas"
+        android:hint="שם מלא"
+        android:id="@+id/fullname"
         />
+    <EditText
+        android:id="@+id/mail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="אימייל"
+        />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="סיסמה"
+
+        />
+
+    <AutoCompleteTextView
+        android:id="@+id/cityMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="עיר מגורים"
+        android:completionThreshold="1"
+        />
+
     <MultiAutoCompleteTextView
         android:id="@+id/subjects"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="מקצועות לימוד"
         android:completionThreshold="1"
-        android:inputType="textMultiLine"
-        />
+        android:inputType="textMultiLine" />
+
     <AutoCompleteTextView
         android:id="@+id/wayOfLearning"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="אופן לימוד"
         android:completionThreshold="1"
-        android:inputType="textMultiLine"
-        />
+        android:inputType="textMultiLine" />
+
     <EditText
         android:id="@+id/pricePerHour"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="מחיר לשעה"
+        android:hint="מחיר לשעה" />
 
-        />
     <EditText
         android:id="@+id/description"
         android:layout_width="match_parent"
@@ -56,21 +77,13 @@
         android:hint="תיאור"
         android:inputType="textMultiLine"
         android:lines="5"
-        android:gravity="top|start"
-        />
+        android:gravity="top|start" />
+
     <Button
         android:id="@+id/signUp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="הירשם"
-        />
-    <Button
-        android:id="@+id/back"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="חזרה"
-        />
-
+        android:text="הירשם" />
 
 
 </LinearLayout>

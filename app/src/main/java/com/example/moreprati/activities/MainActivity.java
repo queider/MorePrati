@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     //firebase database things -----------------------------
     private DatabaseReference teachersRef;
     private TeacherAdapter teacherAdapter;
-    private FirebaseAuth mAuth;
+
 
 
     //search menu things:-------------------------------------------------------
@@ -56,20 +56,22 @@ public class MainActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
 
 
-        teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
 
         // firebase things ------------------------------------------------------
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser == null) {
             // User is not authenticated
-            startActivity(new Intent(MainActivity.this, SignUp.class));
+            startActivity(new Intent(MainActivity.this, RegistrationActivity.class));
+            finish();
+            return;
         }
+
+        teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
 
         Toast.makeText(this, "User is authenticated", Toast.LENGTH_SHORT).show();
 
-
+        Log.d("nigga", "crash");
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         searchTeacherByUid(uid);
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentUser", MODE_PRIVATE);

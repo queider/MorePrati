@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:id="@+id/text_choose_role"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="בחר סוג משתמש"
+        android:textSize="20sp"
+        android:layout_marginTop="120dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="מורה"
+            android:layout_marginTop="20dp"/>
+
+        <Button
+            android:id="@+id/btn_student"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="תלמיד"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/text_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="כבר רשום? התחבר"
+        android:layout_marginTop="40dp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:background="@android:color/transparent"
+        />
+
+</LinearLayout>

@@ -9,7 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.moreprati.R;
-import com.example.moreprati.activities.SignUp;
+import com.example.moreprati.activities.RegistrationActivity;
+import com.example.moreprati.fragments.SignUpTeacherFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class AboutFragment extends Fragment {
@@ -35,7 +36,7 @@ public class AboutFragment extends Fragment {
 
     private void logoutUser() {
         mAuth.signOut();
-        startActivity(new Intent(requireActivity(), SignUp.class));
+        startActivity(new Intent(requireActivity(), RegistrationActivity.class));
         requireActivity().finish(); // Close the current activity
     }
 }
