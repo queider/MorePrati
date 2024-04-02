@@ -2,6 +2,7 @@ package com.example.moreprati.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.moreprati.R;
+import com.example.moreprati.fragments.ChatFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -100,14 +102,31 @@ public class TeacherInfo extends AppCompatActivity {
         makeContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(TeacherInfo.this, ChatActivity.class);
-                intent.putExtra("fullname", fullname);
-                intent.putExtra("uid", uid);
-                intent.putExtra("imageUrl", imageUrl);
-                intent.putExtra("fcmToken", fcmToken);
-                intent.putExtra("cameFromTeacherInfo", true);
-                startActivity(intent);
+                // Create a new instance of the fragment
+                ChatFragment chatFragment = new ChatFragment();
+
+                // Pass data to the fragment using arguments
+                Bundle args = new Bundle();
+                args.putString("fullname", fullname);
+                args.putString("uid", uid);
+                args.putString("imageUrl", imageUrl);
+                args.putString("fcmToken", fcmToken);
+                args.putBoolean("cameFromTeacherInfo", true);
+                chatFragment.setArguments(args);
+
+                // Start the fragment transaction
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                // Replace the current fragment with the new one
+                transaction.replace(R.id.fragment_container, chatFragment);
+
+                // Add the transaction to the back stack (optional)
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
             }
+
         });
 
 

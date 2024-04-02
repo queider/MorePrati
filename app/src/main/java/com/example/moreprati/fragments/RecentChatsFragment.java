@@ -2,7 +2,6 @@ package com.example.moreprati.fragments;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +13,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.moreprati.activities.ChatActivity;
 import com.example.moreprati.R;
 import com.example.moreprati.objects.RecentChats;
 import com.example.moreprati.adapters.RecentChatsAdapter;
@@ -48,8 +46,6 @@ public class RecentChatsFragment extends Fragment {
 
         currentUserId = sharedPreferences.getString("uid", "");
 
-
-
         recyclerView = view.findViewById(R.id.recyclerView);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -57,11 +53,10 @@ public class RecentChatsFragment extends Fragment {
         // Initialize userRef
         userRef = FirebaseDatabase.getInstance().getReference("Messages").child(currentUserId);
 
-        // Initialize the adapter        Log.d("YAZAN", "RecentChatsFragment onCreate 1");
+        // Initialize the adapter
         adapter = new RecentChatsAdapter(getOptions(), chatUserId -> {
-            startChatActivity(chatUserId);
+            startChatFragment(chatUserId);
         });
-
 
         recyclerView.setAdapter(adapter);
 
@@ -90,11 +85,21 @@ public class RecentChatsFragment extends Fragment {
                 .build();
     }
 
-    private void startChatActivity(String chatUserId){
-        Intent intentFromRC = new Intent(requireContext(), ChatActivity.class);
-        intentFromRC.putExtra("chatUserIdFromRecentChats", chatUserId);
-        Log.d("YAZAN", "onItemClick: chatUserId is " + chatUserId + " and is on intent");
-        startActivity(intentFromRC);
+    private void startChatFragment(String chatUserId){
+        // Create a new instance of ChatFragment
+        ChatFragment chatFragment = new ChatFragment();
+
+        // Pass the chatUserId as an argument to the fragment
+        Bundle args = new Bundle();
+        args.putString("chatUserIdFromRecentChats", chatUserId);
+        chatFragment.setArguments(args);
+
+        // Replace the current fragment with ChatFragment
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, chatFragment)
+                .addToBackStack(null)
+                .commit();
     }
     private boolean isCurrentActivity(Class<?> activityClass) {
         return activityClass.isInstance(requireActivity());

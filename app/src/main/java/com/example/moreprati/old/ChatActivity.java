@@ -1,4 +1,4 @@
- package com.example.moreprati.activities;
+ package com.example.moreprati.old;
 
 import androidx.appcompat.app.AppCompatActivity;
 

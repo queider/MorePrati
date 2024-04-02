@@ -44,7 +44,7 @@
             android:name=".activities.TeacherInfo"
             android:exported="false" />
         <activity
-            android:name=".activities.ChatActivity"
+            android:name=".old.ChatActivity"
             android:exported="false" />
         <activity
             android:name=".activities.SignUpTeacher"
