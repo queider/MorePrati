@@ -30,22 +30,42 @@
             android:layout_weight="1"
             android:text="אדם אדמוני"/>
 
+        <!-- activity_main.xml -->
 
-
+        <Button
+            android:id="@+id/timerButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/round_timer_24"
+            />
 
 
     </LinearLayout>
 
 
-    <androidx.recyclerview.widget.RecyclerView
+    <TextView
+        android:id="@+id/selectedTimeTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="לא נקבע שיעור"
         android:layout_marginTop="70dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="80dp"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/messageInputLayout"
         android:padding="8dp"
         android:clipToPadding="false"
-        android:animateLayoutChanges="false" />
+        android:animateLayoutChanges="false" >
+
+    </androidx.recyclerview.widget.RecyclerView>
+
 
     <LinearLayout
         android:id="@+id/messageInputLayout"
@@ -54,6 +74,7 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:padding="8dp">
+
 
 
 

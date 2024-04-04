@@ -1,11 +1,21 @@
 package com.example.moreprati.fragments;
 
+import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 // ChatActivity.java
@@ -15,15 +25,20 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.moreprati.AlarmReceiver;
+import com.example.moreprati.activities.MainActivity;
 import com.example.moreprati.objects.Message;
 import com.example.moreprati.R;
 import com.example.moreprati.adapters.MessageAdapter;
@@ -38,11 +53,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -54,11 +72,19 @@ import okhttp3.Response;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 
 public class ChatFragment extends Fragment {
 
 
+    private static final int REQUEST_CODE_NOTIFICATION = 123213;
 
     private RecyclerView recyclerView;
     private TextInputLayout messageInputLayout;
@@ -84,10 +110,24 @@ public class ChatFragment extends Fragment {
     private final List<Message> messagesList = new ArrayList<>();
     private MessageAdapter messageAdapter;
 
+    //timer button
+    private Button timerButton;
+    private TextView selectedTimeTextView;
+
+    private Button dateTimeButton;
+    private TextView selectedDateTimeTextView;
+    private Calendar calendar;
+
+    private static final int REQUEST_CODE_VIBRATE = 200534; // Any unique integer value
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
+
+        timerButton = view.findViewById(R.id.timerButton);
+        selectedDateTimeTextView = view.findViewById(R.id.selectedTimeTextView);
+
 
         //ui setup
         imageView = view.findViewById(R.id.image);
@@ -145,7 +185,7 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     isTeacher = dataSnapshot.child("isTeacher").getValue(boolean.class);
-                    if(isTeacher){
+                    if (isTeacher) {
                         imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
                     }
                     fullname = dataSnapshot.child("fullname").getValue(String.class);
@@ -154,6 +194,7 @@ public class ChatFragment extends Fragment {
                     textView.setText(fullname);
                     Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
@@ -178,6 +219,14 @@ public class ChatFragment extends Fragment {
         recyclerView.setAdapter(messageAdapter);
 
         loadMessages();
+        timerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(checkNotificationPermissions()) {
+                    showDateTimePickerDialog();
+                }
+            }
+        });
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,10 +238,12 @@ public class ChatFragment extends Fragment {
         // Enable the send button only if the message is not empty
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
@@ -258,20 +309,20 @@ public class ChatFragment extends Fragment {
     }
 
 
-    void sendNotification(String message){
+    void sendNotification(String message) {
 
-        try{
-            JSONObject jsonObject  = new JSONObject();
+        try {
+            JSONObject jsonObject = new JSONObject();
             JSONObject notificationObj = new JSONObject();
-            notificationObj.put("title",fullname);
-            notificationObj.put("body",message);
+            notificationObj.put("title", fullname);
+            notificationObj.put("body", message);
 
             JSONObject dataObj = new JSONObject();
-            dataObj.put("userId",currentUserId);
+            dataObj.put("userId", currentUserId);
 
-            jsonObject.put("notification",notificationObj);
-            jsonObject.put("data",dataObj);
-            jsonObject.put("to",ChatToken);
+            jsonObject.put("notification", notificationObj);
+            jsonObject.put("data", dataObj);
+            jsonObject.put("to", ChatToken);
 
             callApi(jsonObject);
             Log.d("YAZAN Nofitication", "sendNotification: fullname:" + fullname);
@@ -279,17 +330,17 @@ public class ChatFragment extends Fragment {
 
             Log.d("YAZAN Nofitication", "sendNotification: currentUserId:" + currentUserId);
             Log.d("YAZAN Nofitication", "sendNotification: ChatToken:" + ChatToken);
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
 
-    void callApi(JSONObject jsonObject){
+    void callApi(JSONObject jsonObject) {
         MediaType JSON = MediaType.get("application/json");
         OkHttpClient client = new OkHttpClient();
 
         String url = "https://fcm.googleapis.com/fcm/send";
-        RequestBody body = RequestBody.create(jsonObject.toString(),JSON);
+        RequestBody body = RequestBody.create(jsonObject.toString(), JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
@@ -308,19 +359,103 @@ public class ChatFragment extends Fragment {
 
             }
         });
-
     }
 
 
+    private void showDateTimePickerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_datetime_picker, null);
+        builder.setView(dialogView);
+
+        DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
+        TimePicker timePicker = dialogView.findViewById(R.id.timePicker);
+        timePicker.setIs24HourView(true); // Set 24-hour format
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int year = datePicker.getYear();
+                int month = datePicker.getMonth();
+                int dayOfMonth = datePicker.getDayOfMonth();
+                int hourOfDay = timePicker.getHour();
+                int minute = timePicker.getMinute();
+
+                // Handle the selected date and time
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth, hourOfDay, minute);
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                String selectedDateTime = dateFormat.format(calendar.getTime());
+                selectedDateTimeTextView.setText("נקבע שיעור ב "+ selectedDateTime);
+                Toast.makeText(requireContext(), "נקבע שיעור! " , Toast.LENGTH_SHORT).show();
 
 
+                // Check if an alarm is already set for this chatUserId
+                SharedPreferences sharedPreferences = requireContext().getSharedPreferences("Alarms", Context.MODE_PRIVATE);
+                if (!sharedPreferences.contains(chatUserId)) {
+                    // Save the alarm for this chatUserId
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(chatUserId, selectedDateTime);
+                    editor.apply();
 
+                    // Schedule the alarm
+                    setAlarm(calendar, fullname);
+                } else {
+                    // Inform the user that an alarm is already set
+                    Log.d("Yazan", "setAlarm: alarm already set for the user");
+                    Toast.makeText(requireContext(), "נקבע כבר שיעור, מחק את השיעור הנוכחי", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
+        builder.setNegativeButton("Cancel", null);
 
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
+    private void setAlarm(Calendar calendar, String fullname) {
+        // Subtract 5 minutes from the selected time
+        calendar.add(Calendar.MINUTE, -5);
 
+        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(requireContext(), AlarmReceiver.class);
+        intent.putExtra("fullname", fullname); // Pass fullname to the receiver
+        intent.putExtra("chatUserId", chatUserId); // Pass chatUserId to the receiver
 
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        if (alarmManager != null) {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            Log.d("Yazan", "setAlarm: alarm set");
+        }
+    }
 
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), result -> {
+                if (result) {
+                    // Permission is granted
+                    // You can handle any further actions here if needed
+                } else {
+                    // Permission is denied
+                    Toast.makeText(requireContext(), "אפשר התראות בכדי לקבוע שיעורים", Toast.LENGTH_SHORT).show();
 
+                }
+            });
+
+    public boolean checkNotificationPermissions() {
+        // Check if notification permission is already granted
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.VIBRATE)
+                == PackageManager.PERMISSION_GRANTED) {
+            Log.d("Yazan", "checkNotificationPermissions: grandted");
+
+            return true; // Permission is already granted
+        } else {
+            // Request notification permission from the user
+            requestPermissionLauncher.launch(Manifest.permission.VIBRATE);
+            // Return false as permission is not granted (yet)
+            Log.d("Yazan", "checkNotificationPermissions: not grandted");
+            return false;
+        }
+    }
 }

@@ -1,4 +1,7 @@
 package com.example.moreprati.objects;
+
+import java.util.Calendar;
+
 public class RecentChats {
     private String fullname;
     private String imageUrl;
@@ -54,4 +57,6 @@ public class RecentChats {
     public void setChatUserId(String chatUserId) {
         this.chatUserId = chatUserId;
     }
+
+
 }

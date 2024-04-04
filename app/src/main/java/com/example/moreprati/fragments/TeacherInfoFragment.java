@@ -14,7 +14,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.example.moreprati.old.ChatActivity;
 import com.example.moreprati.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -99,16 +98,25 @@ public class TeacherInfoFragment extends Fragment {
         makeContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(requireContext(), ChatActivity.class);
-                intent.putExtra("fullname", fullname);
-                intent.putExtra("uid", uid);
-                intent.putExtra("imageUrl", imageUrl);
-                intent.putExtra("fcmToken", fcmToken);
-                intent.putExtra("cameFromTeacherInfo", true);
-                startActivity(intent);
-            }
+                ChatFragment chatFragment = new ChatFragment();
+                Bundle args = new Bundle();
+                args.putString("fullname", fullname);
+                args.putString("uid", uid);
+                args.putString("imageUrl", imageUrl);
+                args.putString("fcmToken", fcmToken);
+                args.putBoolean("cameFromTeacherInfo", true);
+                chatFragment.setArguments(args);
 
+                // Replace current fragment with ChatFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, chatFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         });
+
+
+
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
