@@ -13,6 +13,8 @@ import com.example.moreprati.activities.RegistrationActivity;
 import com.example.moreprati.fragments.SignUpTeacherFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.File;
+
 public class AboutFragment extends Fragment {
 
     private FirebaseAuth mAuth;
@@ -35,6 +37,20 @@ public class AboutFragment extends Fragment {
     }
 
     private void logoutUser() {
+    // Get the SharedPreferences directory
+        File sharedPreferencesDir = new File(requireContext().getApplicationInfo().dataDir + "/shared_prefs");
+
+    // Get a list of all files in the directory
+        File[] sharedPrefFiles = sharedPreferencesDir.listFiles();
+
+    // Iterate through each file and delete it
+        if (sharedPrefFiles != null) {
+            for (File sharedPrefFile : sharedPrefFiles) {
+                sharedPrefFile.delete();
+            }
+        }
+
+
         mAuth.signOut();
         startActivity(new Intent(requireActivity(), RegistrationActivity.class));
         requireActivity().finish(); // Close the current activity

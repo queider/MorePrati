@@ -2,6 +2,8 @@ package com.example.moreprati.fragments;
 
 import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
 
+import static androidx.core.content.ContextCompat.registerReceiver;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -11,9 +13,12 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -32,6 +37,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,6 +59,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -117,6 +124,8 @@ public class ChatFragment extends Fragment {
     private Button dateTimeButton;
     private TextView selectedDateTimeTextView;
     private Calendar calendar;
+    SharedPreferences sharedPreferences ;
+    private BroadcastReceiver receiver;
 
     private static final int REQUEST_CODE_VIBRATE = 200534; // Any unique integer value
 
@@ -136,9 +145,9 @@ public class ChatFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         messagesReference = FirebaseDatabase.getInstance().getReference().child("Messages");
 
-        // Get the users ids ---------------------------------------------------------------------
-        //get my id:
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+        // Get users info ------------------------------------------------------------------------------
+
+        sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
         currentUserId = sharedPreferences.getString("uid", "");
 
         Bundle args = getArguments();
@@ -190,7 +199,7 @@ public class ChatFragment extends Fragment {
                     }
                     fullname = dataSnapshot.child("fullname").getValue(String.class);
                     ChatToken = dataSnapshot.child("fcmToken").getValue(String.class);
-                    Log.d("Yazan", "onDataChange: FullNAME IS " + fullname);
+                    Log.d("YAZAN", "onDataChange: FullNAME IS " + fullname);
                     textView.setText(fullname);
                     Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
                 }
@@ -200,14 +209,13 @@ public class ChatFragment extends Fragment {
 
                 }
             });
-            Log.d("Yazan", "onDataChange: FullNAME IS 2" + fullname);
+            Log.d("YAZAN", "onDataChange: FullNAME IS 2" + fullname);
         }
 
 
         Log.d("YAZAN ChatAcitvity", "current user is: " + currentUserId);
         Log.d("YAZAN ChatAcitvity", "chat user is: " + chatUserId);
-
-
+        // Setup ----------------------------------------------------------------------------------------
         recyclerView = view.findViewById(R.id.recyclerView);
         messageInputLayout = view.findViewById(R.id.messageEditText);
         messageEditText = messageInputLayout.findViewById(R.id.textInputEditText);
@@ -217,16 +225,59 @@ public class ChatFragment extends Fragment {
         messageAdapter = new MessageAdapter(messagesList, currentUserId);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(messageAdapter);
-
         loadMessages();
+        // Alarm ----------------------------------------------------------------------------------
+
+
+        sharedPreferences = requireContext().getSharedPreferences("Alarms", Context.MODE_PRIVATE);
+        String savedDateTime = sharedPreferences.getString(chatUserId, null);
+        if (sharedPreferences.contains(chatUserId)) {
+            selectedDateTimeTextView.setText("נקבע שיעור ב "+ savedDateTime);
+            timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
+        }else {
+            timerButton.setBackgroundResource(R.drawable.round_timer_24);
+
+        }
+
         timerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkNotificationPermissions()) {
-                    showDateTimePickerDialog();
+
+
+                if (!sharedPreferences.contains(chatUserId)) {
+                    Log.d("YAZAN", "Alarm: No alarm is set, launching date picker.");
+                    if (checkNotificationPermissions()) {
+                        showDateTimePickerDialog();
+                    }
+                } else {
+                    Log.d("YAZAN", "Alarm: Canceled Alarm");
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(chatUserId);
+                    editor.apply();
+                    timerButton.setBackgroundResource(R.drawable.round_timer_24);
+                    selectedDateTimeTextView.setText("לא נקבע שיעור");
+                    Toast.makeText(requireContext(), "השיעור בוטל", Toast.LENGTH_SHORT).show();
+
+
                 }
             }
         });
+
+        // Register BroadcastReceiver to listen for broadcasts
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d("YAZAN", "Alarm: alarm received, deleting from ui.");
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(chatUserId);
+                editor.apply();
+                timerButton.setBackgroundResource(R.drawable.round_timer_24);
+                selectedDateTimeTextView.setText("לא נקבע שיעור");
+            }
+        };
+        IntentFilter filter = new IntentFilter("RECEIVED_ALARM");
+        requireContext().registerReceiver(receiver, filter);
+
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -252,6 +303,13 @@ public class ChatFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Unregister the BroadcastReceiver when the Fragment's view is destroyed
+        requireContext().unregisterReceiver(receiver);
     }
 
     private void loadMessages() {
@@ -387,11 +445,12 @@ public class ChatFragment extends Fragment {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
                 String selectedDateTime = dateFormat.format(calendar.getTime());
                 selectedDateTimeTextView.setText("נקבע שיעור ב "+ selectedDateTime);
+                timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
                 Toast.makeText(requireContext(), "נקבע שיעור! " , Toast.LENGTH_SHORT).show();
 
 
                 // Check if an alarm is already set for this chatUserId
-                SharedPreferences sharedPreferences = requireContext().getSharedPreferences("Alarms", Context.MODE_PRIVATE);
+                sharedPreferences = requireContext().getSharedPreferences("Alarms", Context.MODE_PRIVATE);
                 if (!sharedPreferences.contains(chatUserId)) {
                     // Save the alarm for this chatUserId
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -402,7 +461,7 @@ public class ChatFragment extends Fragment {
                     setAlarm(calendar, fullname);
                 } else {
                     // Inform the user that an alarm is already set
-                    Log.d("Yazan", "setAlarm: alarm already set for the user");
+                    Log.d("YAZAN", "setAlarm: alarm already set for the user");
                     Toast.makeText(requireContext(), "נקבע כבר שיעור, מחק את השיעור הנוכחי", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -423,39 +482,33 @@ public class ChatFragment extends Fragment {
         intent.putExtra("fullname", fullname); // Pass fullname to the receiver
         intent.putExtra("chatUserId", chatUserId); // Pass chatUserId to the receiver
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        int requestCode = 123; // Unique request code, you can define your own
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), requestCode, intent, PendingIntent.FLAG_MUTABLE);
 
         if (alarmManager != null) {
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-            Log.d("Yazan", "setAlarm: alarm set");
+            Log.d("YAZAN", "setAlarm: alarm set");
+
         }
     }
 
-    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(), result -> {
-                if (result) {
-                    // Permission is granted
-                    // You can handle any further actions here if needed
-                } else {
-                    // Permission is denied
-                    Toast.makeText(requireContext(), "אפשר התראות בכדי לקבוע שיעורים", Toast.LENGTH_SHORT).show();
-
-                }
-            });
 
     public boolean checkNotificationPermissions() {
-        // Check if notification permission is already granted
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.VIBRATE)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.d("Yazan", "checkNotificationPermissions: grandted");
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
+        boolean areNotificationsEnabled = notificationManager.areNotificationsEnabled();
 
-            return true; // Permission is already granted
+        if (areNotificationsEnabled) {
+            Log.d("YAZAN", "Alarm: checkNotificationPermissions: " + areNotificationsEnabled);
+            return true;
         } else {
-            // Request notification permission from the user
-            requestPermissionLauncher.launch(Manifest.permission.VIBRATE);
-            // Return false as permission is not granted (yet)
-            Log.d("Yazan", "checkNotificationPermissions: not grandted");
-            return false;
-        }
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_NOTIFICATION);
+            areNotificationsEnabled = notificationManager.areNotificationsEnabled();
+            if (areNotificationsEnabled) {
+                return true;
+                } else {
+                    return false;
+                }
+            }
+
     }
 }

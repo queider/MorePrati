@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
@@ -20,17 +21,23 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String fullname = intent.getStringExtra("fullname");
         String chatUserId = intent.getStringExtra("chatUserId");
-
-        // Handle the alarm action here
-
-        // Delete the chatUserId from shared preferences
         SharedPreferences sharedPreferences = context.getSharedPreferences("Alarms", Context.MODE_PRIVATE);
-        if (sharedPreferences.contains(chatUserId)) {
+
+        // Check if the alarm is deleted
+        if (sharedPreferences.contains(chatUserId)){
+
+            // Send a broadcast to update ui for recived alarm/
+            Intent broadcastIntent = new Intent("RECEIVED_ALARM");
+            context.sendBroadcast(broadcastIntent);
+
+            // Delete the chatUserId from shared preferences
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.remove(chatUserId);
             editor.apply();
+
+            //Send notification
+            showNotification(context, fullname);
         }
-        showNotification(context, fullname);
     }
 
     private void showNotification(Context context, String fullname) {
@@ -47,8 +54,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.baseline_school_24)
-                .setContentTitle("Lesson Reminder")
-                .setContentText("You have a lesson with " + fullname)
+                .setContentTitle("תזכורת לשיעור")
+                .setContentText("יש לך שיעור בעוד 5 דקות עם " + fullname)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         Notification notification = builder.build();

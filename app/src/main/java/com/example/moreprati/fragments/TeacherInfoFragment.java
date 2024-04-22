@@ -1,6 +1,8 @@
 package com.example.moreprati.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -24,6 +27,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 public class TeacherInfoFragment extends Fragment {
@@ -116,55 +122,64 @@ public class TeacherInfoFragment extends Fragment {
         });
 
 
-
-
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float userRating, boolean fromUser) {
+                SharedPreferences sharedPreferences = requireContext().getSharedPreferences("RatingPrefs", Context.MODE_PRIVATE);
+                String lastRatingDate = sharedPreferences.getString("lastRatingDate", "");
 
-// Assume you have a reference to your Firebase Database
-                DatabaseReference teacherRef = FirebaseDatabase.getInstance().getReference().child("Teachers").child(uid);
+                // Get the current date
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String currentDate = dateFormat.format(new Date());
 
-// Step 1: Retrieve the current values
-                teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        // Step 2: Modify the retrieved values
-                        float currentRating = dataSnapshot.child("rating").getValue(Float.class);
-                        int howManyRated = dataSnapshot.child("howManyRated").getValue(Integer.class);
+                if (lastRatingDate.equals(currentDate)) {
+                    // User already rated for the day, show toast
+                    Toast.makeText(requireContext(), "You have already rated for today", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Update the last rating date in SharedPreferences
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("lastRatingDate", currentDate);
+                    editor.apply();
 
-                        float newRating = calculateNewRating(currentRating, howManyRated, userRating);
-                        int newHowManyRated = howManyRated + 1;
+                    DatabaseReference teacherRef = FirebaseDatabase.getInstance().getReference().child("Teachers").child(uid);
+                    teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            // Step 2: Modify the retrieved values
+                            float currentRating = dataSnapshot.child("rating").getValue(Float.class);
+                            int howManyRated = dataSnapshot.child("howManyRated").getValue(Integer.class);
 
-                        ratingTextView.setText(String.valueOf(newRating));
+                            float newRating = calculateNewRating(currentRating, howManyRated, userRating);
+                            int newHowManyRated = howManyRated + 1;
 
-
-                        // Step 3: Update the values in Firebase
-                        teacherRef.child("rating").setValue(newRating);
-                        teacherRef.child("howManyRated").setValue(newHowManyRated)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("FirebaseUpdate", "Values updated successfully!");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.e("FirebaseUpdate", "Error updating values: " + e.getMessage());
-                                    }
-                                });
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("FirebaseUpdate", "Error reading values: " + databaseError.getMessage());
-                    }
-                });
-                Log.d("Rating", "New Rating: " + rating);
+                            ratingTextView.setText(String.valueOf(newRating));
 
 
+                            // Step 3: Update the values in Firebase
+                            teacherRef.child("rating").setValue(newRating);
+                            teacherRef.child("howManyRated").setValue(newHowManyRated)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Log.d("FirebaseUpdate", "Values updated successfully!");
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("FirebaseUpdate", "Error updating values: " + e.getMessage());
+                                        }
+                                    });
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("FirebaseUpdate", "Error reading values: " + databaseError.getMessage());
+                        }
+                    });
+                    Log.d("Rating", "New Rating: " + rating);
+
+                }
             }
         });
         return view;

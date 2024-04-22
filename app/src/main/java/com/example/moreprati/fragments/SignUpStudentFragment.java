@@ -1,5 +1,7 @@
 package com.example.moreprati.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -20,16 +22,27 @@ import androidx.fragment.app.Fragment;
 import com.example.moreprati.R;
 import com.example.moreprati.activities.MainActivity;
 import com.example.moreprati.objects.Student;
+import com.example.moreprati.objects.Teacher;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+
+
 
 public class SignUpStudentFragment extends Fragment {
     private FirebaseAuth mAuth; // firebase thing
     private String uid;
+    private String fcmToken;
+    private String fullname;
+    private String mail;
+    private String city;
+    private String password;
+
+
 
     @Nullable
     @Override
@@ -49,22 +62,21 @@ public class SignUpStudentFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String fullname = ((EditText) rootView.findViewById(R.id.fullname)).getText().toString();
-                String mail = ((EditText) rootView.findViewById(R.id.mail)).getText().toString();
-                String password = ((EditText) rootView.findViewById(R.id.password)).getText().toString();
-                String city = cityMenu.getText().toString();
+                 fullname = ((EditText) rootView.findViewById(R.id.fullname)).getText().toString();
+                 mail = ((EditText) rootView.findViewById(R.id.mail)).getText().toString();
+                 password = ((EditText) rootView.findViewById(R.id.password)).getText().toString();
+                 city = cityMenu.getText().toString();
 
-                if(validation(fullname, mail, password, city)) {
-                    registerStudent(fullname, mail, password, city);
+                if(validation()) {
+                    registerStudent();
                 }
             }
         });
-
         return rootView;
     }
 
     // Auth & Register in firebase
-    private void registerStudent(String fullname, String mail, String password, String city) {
+    private void registerStudent() {
         mAuth.createUserWithEmailAndPassword(mail, password)
                 .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
@@ -77,7 +89,7 @@ public class SignUpStudentFragment extends Fragment {
                             uid = mAuth.getCurrentUser().getUid();
 
                             // Now you can link the user to additional information in the database
-                            linkUserToDatabase(fullname, mail, city, uid);
+                            linkUserToDatabase();
 
                             startActivity(new Intent(requireContext(), MainActivity.class));
                         } else {
@@ -90,16 +102,37 @@ public class SignUpStudentFragment extends Fragment {
     }
 
     // Adding the student to the db
-    private void linkUserToDatabase(String fullname, String mail, String city, String uid) {
-        Student student = new Student(fullname, mail, city, uid);
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Students");
-        String userKey = usersRef.push().getKey();
-        usersRef.child(userKey).child(uid).setValue(student);
-        Log.d("SignUpFragment", "linkUserToDatabase: DONE");
+
+
+    private void linkUserToDatabase() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                fcmToken = task.getResult();
+                Log.d("YAZAN", "getFCMToken (SignUPTeacher): " + fcmToken);
+                proceedWithLinking();
+            } else {
+                Log.e("YAZAN", "Error getting FCM token: " + task.getException());
+            }
+        });
     }
 
+    private void proceedWithLinking() {
+        Student student = new Student(fullname, mail, city, uid, fcmToken);
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Students");
+        usersRef.child(uid).setValue(student)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "linkUserToDatabase: Registers student");
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else {
+                        Log.w(TAG, "linkUserToDatabase: Failure", task.getException());
+                    }
+                });
+    }
     // form validation
-    private boolean validation(String fullname, String mail, String passport, String city) {
+    private boolean validation() {
         // Add your validation logic here
 
         return true; // For now, always return true for simplicity

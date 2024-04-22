@@ -251,16 +251,15 @@ public class SignUpTeacherFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "linkUserToDatabase: Registers teacher");
-                        goToMainActivity();
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
                     } else {
                         Log.w(TAG, "linkUserToDatabase: Failure", task.getException());
                     }
                 });
     }
 
-    void goToMainActivity() {
-        //startActivity(new Intent(SignUpTeacherFragment.this, MainActivity.class));
-    }
     private boolean validation() {
         // checks if all fields are entered.
 
