@@ -1,5 +1,6 @@
 package com.example.moreprati.adapters;// MessageAdapter.java
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if (senderUid.equals(currentUserId)) {
                 messageTextView.setBackgroundResource(R.drawable.receiver_bubble);
                 // Set other properties for the sender's bubble
-            } else {
+                messageTextView.setGravity(Gravity.END); // Align text to the end (right) of the view
+            }else {
                 messageTextView.setBackgroundResource(R.drawable.sender_bubble);
                 // Set other properties for the receiver's bubble
             }

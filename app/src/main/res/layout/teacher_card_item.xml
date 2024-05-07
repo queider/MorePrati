@@ -1,12 +1,20 @@
 <!-- teacher_card_item.xml -->
+
+
+<com.google.android.material.card.MaterialCardView     xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Material3.CardView.Elevated"
+    android:id="@+id/card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="10dp"
+    >
+
+
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
-
-    <!-- Display teacher's profile picture -->
+    >
 
     <ImageView
         android:id="@+id/profilePic"
@@ -15,23 +23,53 @@
         android:src="@drawable/default_profile_pic"
         android:scaleType="centerCrop"/>
 
-    <!-- Display other information -->
-    <TextView
-        android:id="@+id/fullname"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="שם מלא"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:paddingHorizontal="10dp"
+        android:layout_marginBottom="10dp"
 
-    <TextView
-        android:id="@+id/rating"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:text="דירוג"
-        />
+        >
+
+        <TextView
+            android:gravity="center"
+            android:id="@+id/fullname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:text="שם מלא"
+            android:textSize="35sp"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            />
+
+        <TextView
+            android:id="@+id/subjects"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="פסנטר · מתמטיקה · גיטרה"
+            android:gravity="center"
+            android:paddingHorizontal="10dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            />
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="41dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="4dp"
+            android:scaleX="0.5"
+            android:scaleY="0.5"
+            android:isIndicator="true"
+            />
+
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,42 +79,69 @@
 
         >
         <TextView
+            android:gravity="center"
             android:id="@+id/wayOfLearning"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold"
-            android:text="דרך לימוד"
+            android:layout_weight="1"
+            android:text="מרוחק ופרונטלי"
+            android:paddingHorizontal="10dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:text="•"
             android:paddingHorizontal="10dp"
             />
+
         <TextView
+            android:gravity="center"
+
             android:id="@+id/pricePerHour"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold"
-            android:text="מחיר לשעה"
+            android:text="90 ₪ לשעה"
+            android:layout_weight="1"
+
+            android:paddingHorizontal="10dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:text="•"
             android:paddingHorizontal="10dp"
             />
         <TextView
+            android:layout_weight="1"
+            android:gravity="center"
             android:id="@+id/city"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold"
-            android:text="עיר"
+            android:text="פתח תקווה"
             android:paddingHorizontal="10dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             />
 
-        <TextView
-            android:id="@+id/subjects"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:text="מקצועות"
-            android:paddingHorizontal="10dp"
-            />
+
+    </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>

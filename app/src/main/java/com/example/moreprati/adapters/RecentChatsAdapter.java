@@ -60,7 +60,15 @@ public class RecentChatsAdapter extends FirebaseRecyclerAdapter<RecentChats, Rec
 
         if (position >= 0 && model != null) {
             holder.chatUserName.setText(model.getFullname());
-            holder.lastMessage.setText(model.getLastMessage());
+            String lastMessage = model.getLastMessage();
+            if (lastMessage != null) {
+                if (lastMessage.length() > 20) {
+                    lastMessage = lastMessage.substring(0, 17) + "...";
+                }
+            }
+
+            holder.lastMessage.setText(lastMessage);
+
             Picasso.get()
                     .load(model.getImageUrl())
                     .placeholder(R.drawable.default_profile_pic)

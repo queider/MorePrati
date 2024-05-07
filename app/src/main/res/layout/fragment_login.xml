@@ -1,28 +1,71 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp">
+>
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
+        style="?attr/textInputFilledStyle"
         android:id="@+id/mail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="30dp"
         android:hint="אימייל"
-        android:inputType="textMultiLine" />
+        app:startIconDrawable="@drawable/baseline_email_24"
 
-    <EditText
+
+
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="?attr/textInputFilledStyle"
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="סיסמה"
-        android:inputType="textMultiLine" />
+        app:endIconMode="password_toggle"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp"
+        android:textDirection="rtl"
+        app:startIconDrawable="@drawable/baseline_password_24"
+        >
 
-    <Button
-        android:id="@+id/login"
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="התחבר" />
+        android:layout_height="match_parent">
+
+        <!-- Other views or layout elements -->
+
+        <Button
+            android:layout_margin="30dp"
+            android:id="@+id/login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="התחבר"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            /> <!-- Align to the end (right side) of the parent RelativeLayout -->
+
+    </RelativeLayout>
 
 
 </LinearLayout>

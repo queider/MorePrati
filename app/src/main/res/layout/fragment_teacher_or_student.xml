@@ -2,8 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+
+    >
 
     <TextView
         android:id="@+id/text_choose_role"
@@ -11,27 +14,40 @@
         android:layout_height="wrap_content"
         android:text="בחר סוג משתמש"
         android:textSize="20sp"
-        android:layout_marginTop="120dp"/>
+        android:layout_marginTop="120dp"
+        android:fontFamily="@font/heebo_variablefont_wght"
+
+        />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="400dp"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_teacher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="120dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="20dp"
             android:text="מורה"
-            android:layout_marginTop="20dp"/>
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            />
+
 
         <Button
             android:id="@+id/btn_student"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="תלמיד"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="120dp"
+            android:layout_height="200dp"
+            android:layout_marginLeft="20dp"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"/>
+            app:cornerRadius="20dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            android:text="תלמיד" />
 
     </LinearLayout>
 
@@ -43,6 +59,8 @@
         android:layout_marginTop="40dp"
         android:textColor="@android:color/holo_blue_dark"
         android:background="@android:color/transparent"
+        android:fontFamily="@font/heebo_variablefont_wght"
+
         />
 
 </LinearLayout>

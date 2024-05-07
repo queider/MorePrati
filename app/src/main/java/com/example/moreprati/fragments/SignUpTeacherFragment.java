@@ -9,7 +9,9 @@ import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,6 +35,7 @@ import com.example.moreprati.objects.Teacher;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 
@@ -48,6 +51,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 
 public class SignUpTeacherFragment extends Fragment {
@@ -75,7 +80,7 @@ public class SignUpTeacherFragment extends Fragment {
     private String[] subjects = new String[0];
 
     private String wayOfLearningString;
-    private int pricePerHour;
+    private int pricePerHour = 0;
 
     private String description;
 
@@ -140,14 +145,44 @@ public class SignUpTeacherFragment extends Fragment {
         SignupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get the selected values from the MultiAutoCompleteTextView
+                TextInputLayout fullnameLayout = view.findViewById(R.id.fullname);
+                EditText fullnameEditText = fullnameLayout.getEditText();
+                if (fullnameEditText != null) {
+                    // Get the text from the EditText and convert it to string
+                    fullname = fullnameEditText.getText().toString();
+                }
+
+                TextInputLayout mailLayout = view.findViewById(R.id.mail);
+                EditText mailEditText = mailLayout.getEditText();
+                if (mailEditText != null) {
+                    mail = mailEditText.getText().toString();
+                }
+
+                TextInputLayout passwordLayout = view.findViewById(R.id.password);
+                EditText passwordEditText = passwordLayout.getEditText();
+                if (passwordEditText != null) {
+                    password = passwordEditText.getText().toString();
+                }
+
+                TextInputLayout descriptionLayout = view.findViewById(R.id.description);
+                EditText descriptionEditText = descriptionLayout.getEditText();
+                if (descriptionEditText != null) {
+                    description = descriptionEditText.getText().toString();
+                }
+
+                TextInputLayout pricePerHourLayout = view.findViewById(R.id.pricePerHour);
+                EditText pricePerHourEditText = pricePerHourLayout.getEditText();
+                if (pricePerHourEditText != null) {
+                    try {
+                        pricePerHour = Integer.parseInt(pricePerHourEditText.getText().toString());
+                    } catch (NumberFormatException e) {
+                        pricePerHour = 0;
+                    }
+                }
+
+
                 String text = multiAutoCompleteTextView.getText().toString();
-                pricePerHour = Integer.parseInt(((EditText) view.findViewById(R.id.pricePerHour)).getText().toString());
-                description = ((EditText) view.findViewById(R.id.description)).getText().toString();
                 wayOfLearningString = wayOfLearning.getText().toString();
-                fullname = ((EditText) view.findViewById(R.id.fullname)).getText().toString();
-                mail = ((EditText) view.findViewById(R.id.mail)).getText().toString();
-                password = ((EditText) view.findViewById(R.id.password)).getText().toString();
                 city = cityMenu.getText().toString();
 
                 if (!text.isEmpty()) {
@@ -251,6 +286,7 @@ public class SignUpTeacherFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "linkUserToDatabase: Registers teacher");
+                        registerTeacher(teacher);
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         startActivity(intent);
                         getActivity().finish();
@@ -260,45 +296,78 @@ public class SignUpTeacherFragment extends Fragment {
                 });
     }
 
+    private void registerTeacher(Teacher teacher) {
+        Log.d("YAZAN", "[+] User is Teacher -------------------------------- ");
+
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putBoolean("isTeacher", true);
+        editor.putString("fullname", teacher.getFullname());
+        editor.putString("uid", teacher.getUid());
+        editor.putString("image", teacher.getImage());
+        editor.putString("fcmToken", fcmToken);
+
+        editor.apply();
+    }
+
     private boolean validation() {
-        // checks if all fields are entered.
 
-        /*
-        if(wayOfLearning.isEmpty() || pricePerHour.isEmpty() || description.isEmpty() || subjects[0] == null) {
-            Toast.makeText(this, "מלא את כל השדות", Toast.LENGTH_SHORT).show();
+        if( fullname.isEmpty() || mail.isEmpty() || city.isEmpty() || subjectMap.isEmpty() || wayOfLearningString.isEmpty() || pricePerHour == 0 || description.isEmpty() || subjects[0] == null) {
+            Toast.makeText(getContext(), "מלא את כל השדות", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        try {
-            Integer.parseInt(pricePerHour);
-        } catch(Exception e) {
-            Toast.makeText(this, "מחיר לשעה שגוי", Toast.LENGTH_SHORT).show();
+        if (fullname.length() > 15){
+            Toast.makeText(getContext(), "שם מלא ארוך מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        // checks passport length
-        if(pricePerHour.length() > 5) {
-            Toast.makeText(this, "מחיר לשעה שגוי", Toast.LENGTH_SHORT).show();
+        if (fullname.length() < 4){
+            Toast.makeText(getContext(), "שם מלא קצר מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // בדיקה של פורמט האיימיל
+        final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
+        Pattern pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(mail);
+        if(!matcher.matches()){
+            Toast.makeText(getContext(), "אימייל לא בפורמט הנכון", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (mail.length() > 30){
+            Toast.makeText(getContext(), "אימייל ארוך מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(pricePerHour > 1000) {
+            Toast.makeText(getContext(), "מחיר לשעה גדול מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if(pricePerHour < 10) {
+            Toast.makeText(getContext(), "מחיר לשעה קטן מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(description.length() > 400)
         {
-            Toast.makeText(this, "אודות המורה קצר מידי", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "אודות המורה קצר מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(description.length() < 20)
         {
-            Toast.makeText(this, "אודות ארוך מידי", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "אודות ארוך מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(profilePicLocalUri == null) {
-            Toast.makeText(this, "העלה תמונת פרופיל", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "העלה תמונת פרופיל", Toast.LENGTH_SHORT).show();
             return false;
         }
-        */
+
         return true;
     }
     private void uploadProfilePicToStorage(Uri imageUri) {

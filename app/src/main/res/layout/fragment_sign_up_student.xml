@@ -6,45 +6,166 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".fragments.SignUpStudentFragment"
-    android:padding="150px"
     >
 
 
-    <EditText
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        style="@style/Widget.Material3.CardView.Elevated"
+        app:cardCornerRadius="50dp"
+
+        >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:alpha="0.5"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/baseline_hide_image_24"
+
+                />
+
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profilePic"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:scaleType="centerCrop"
+                />
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cameraButton"
+                style="?attr/materialIconButtonFilledStyle"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                app:icon="@drawable/baseline_camera_alt_24"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="10dp"
+                app:iconSize="30dp"
+                />
+
+
+        </RelativeLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="?attr/textInputFilledStyle"
+        android:id="@+id/fullname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="שם מלא"
-        android:id="@+id/fullname"
-        />
-    <EditText
+        android:layout_margin="30dp"
+        app:startIconDrawable="@drawable/baseline_person_24"
+
+        >
+
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="?attr/textInputFilledStyle"
         android:id="@+id/mail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp"
         android:hint="אימייל"
-        />
+        app:startIconDrawable="@drawable/baseline_email_24"
 
-    <EditText
+
+
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="?attr/textInputFilledStyle"
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="סיסמה"
+        app:endIconMode="password_toggle"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp"
+        android:textDirection="rtl"
+        app:startIconDrawable="@drawable/baseline_password_24"
+        >
 
-        />
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
 
-    <AutoCompleteTextView
-        android:id="@+id/cityMenu"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="עיר מגורים"
-        android:completionThreshold="1"
-        />
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp"
+        app:startIconDrawable="@drawable/baseline_location_city_24"
 
-    <Button
-        android:id="@+id/studentSignUp"
+
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/cityMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:completionThreshold="1"
+            android:inputType="none"
+            android:hint="עיר מגורים"
+
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="הרשם בתור תלמיד"
-        />
+        android:layout_height="match_parent">
+
+        <!-- Other views or layout elements -->
+
+        <Button
+            android:layout_margin="30dp"
+            android:id="@+id/studentSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="הרשם"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            /> <!-- Align to the end (right side) of the parent RelativeLayout -->
+
+    </RelativeLayout>
 
 
 </LinearLayout>

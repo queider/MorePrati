@@ -1,5 +1,9 @@
 package com.example.moreprati.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -16,14 +20,20 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import com.example.moreprati.R;
+import com.example.moreprati.activities.RegistrationActivity;
 import com.example.moreprati.objects.Teacher;
 import com.example.moreprati.adapters.TeacherAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.squareup.picasso.Picasso;
 
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +72,24 @@ public class SearchFragment extends Fragment {
 
 
         setUpRecyclerView();
+
+
+        //loads profile pic image
+
+        SharedPreferences CurrentUserSP = requireContext().getSharedPreferences("CurrentUser", requireContext().MODE_PRIVATE);
+        String profilePicUri =  CurrentUserSP.getString("image", ""); // Returns an empty string if "image" is not found
+        ShapeableImageView profilePicImageView = view.findViewById(R.id.profilePic);
+        if(!profilePicUri.isEmpty()){
+            Picasso.get()
+                    .load(profilePicUri)
+                    .placeholder(R.drawable.default_profile_pic) // Placeholder image while loading
+                    .error(R.drawable.default_profile_pic) // Image to display if loading fails
+                    .fit() // Fit the image into the ImageView
+                    .centerCrop() // Center crop the image if it's not square
+                    .into(profilePicImageView);
+
+        }
+
 
         //search menu
         cities = getResources().getStringArray(R.array.cites);
@@ -107,6 +135,48 @@ public class SearchFragment extends Fragment {
                 searchCity = null;
                 searchSubject = null;
                 setUpRecyclerView();
+            }
+        });
+
+
+        Button logoutButton = view.findViewById(R.id.logout);
+
+        // Set click listener for the logout button
+
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+                builder.setTitle("הודעה");
+                builder.setMessage("האם ברצונך לצאת מהמשתמש?");
+                builder.setPositiveButton("צא", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        File sharedPreferencesDir = new File(requireContext().getApplicationInfo().dataDir + "/shared_prefs");
+
+                        // Get a list of all files in the directory
+                        File[] sharedPrefFiles = sharedPreferencesDir.listFiles();
+
+                        // Iterate through each file and delete it
+                        if (sharedPrefFiles != null) {
+                            for (File sharedPrefFile : sharedPrefFiles) {
+                                sharedPrefFile.delete();
+                            }
+                        }
+
+                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                        mAuth.signOut();
+                        startActivity(new Intent(requireActivity(), RegistrationActivity.class));
+                        requireActivity().finish(); // Close the current activity
+                    }
+                });
+                builder.setNegativeButton("ביטול", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.show();
             }
         });
 

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".fragments.studentEditFragment">
+
+
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="250dp"
+            style="@style/Widget.Material3.CardView.Elevated"
+            app:cardCornerRadius="50dp"
+
+            >
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+
+                <ImageView
+                    android:alpha="0.5"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/baseline_hide_image_24"
+
+                    />
+
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profilePic"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:scaleType="centerCrop"
+                    />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/cameraButton"
+                    style="?attr/materialIconButtonFilledStyle"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    app:icon="@drawable/baseline_camera_alt_24"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_margin="10dp"
+                    app:iconSize="30dp"
+                    />
+
+
+            </RelativeLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        app:startIconDrawable="@drawable/baseline_location_city_24"
+
+
+        >
+    <AutoCompleteTextView
+        android:id="@+id/cityMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:completionThreshold="1"
+        android:inputType="none"
+        android:hint="עיר מגורים"
+        android:fontFamily="@font/heebo_variablefont_wght"
+
+
+        />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Other views or layout elements -->
+
+        <Button
+            android:layout_margin="30dp"
+            android:id="@+id/studentSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="עדכן פרופיל"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
+            /> <!-- Align to the end (right side) of the parent RelativeLayout -->
+
+    </RelativeLayout>
+
+
+</LinearLayout>

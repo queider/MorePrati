@@ -40,6 +40,7 @@ public class Teacher {
         this.description = description;
         this.image = image;
         this.rating = 0;
+        this.howManyRated = 0;
         this.fcmToken = fcmToken;
     }
 

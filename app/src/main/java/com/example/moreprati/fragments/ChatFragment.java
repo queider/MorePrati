@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -28,6 +29,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -45,9 +49,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moreprati.AlarmReceiver;
 import com.example.moreprati.activities.MainActivity;
+import com.example.moreprati.objects.Alarm;
 import com.example.moreprati.objects.Message;
 import com.example.moreprati.R;
 import com.example.moreprati.adapters.MessageAdapter;
+import com.example.moreprati.objects.ObjectSerialization;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -111,7 +118,6 @@ public class ChatFragment extends Fragment {
 
     private TextView textView;
 
-    private boolean isTeacher;
 
 
     private final List<Message> messagesList = new ArrayList<>();
@@ -127,12 +133,16 @@ public class ChatFragment extends Fragment {
     SharedPreferences sharedPreferences ;
     private BroadcastReceiver receiver;
 
-    private static final int REQUEST_CODE_VIBRATE = 200534; // Any unique integer value
 
+
+    @SuppressLint("SetTextI18n")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        Log.d("YAZAN", "Chat: Entered");
+
+
 
         timerButton = view.findViewById(R.id.timerButton);
         selectedDateTimeTextView = view.findViewById(R.id.selectedTimeTextView);
@@ -161,24 +171,18 @@ public class ChatFragment extends Fragment {
             imageUrl = args.getString("imageUrl");
             fullname = args.getString("fullname");
             ChatToken = args.getString("fcmToken");
-            isTeacher = args.getBoolean("isTeacher", true);
             textView.setText(fullname);
             Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
 
 
             //my info
             messagesReference.child(chatUserId).child(currentUserId).child("fullname").setValue(sharedPreferences.getString("fullname", ""));
-            messagesReference.child(chatUserId).child(currentUserId).child("isTeacher").setValue(sharedPreferences.getBoolean("isTeacher", true));
             messagesReference.child(chatUserId).child(currentUserId).child("fcmToken").setValue(sharedPreferences.getString("fcmToken", ""));
             messagesReference.child(chatUserId).child(currentUserId).child("chatUserId").setValue(currentUserId);
+            messagesReference.child(chatUserId).child(currentUserId).child("imageUrl").setValue(sharedPreferences.getString("image", ""));
 
-
-            if (sharedPreferences.getBoolean("isTeacher", true)) {
-                messagesReference.child(chatUserId).child(currentUserId).child("imageUrl").setValue(sharedPreferences.getString("image", ""));
-            }
             //chat user info
             messagesReference.child(currentUserId).child(chatUserId).child("fullname").setValue(fullname);
-            messagesReference.child(currentUserId).child(chatUserId).child("isTeacher").setValue(isTeacher);
             messagesReference.child(currentUserId).child(chatUserId).child("imageUrl").setValue(imageUrl);
             messagesReference.child(currentUserId).child(chatUserId).child("fcmToken").setValue(ChatToken);
             messagesReference.child(currentUserId).child(chatUserId).child("chatUserId").setValue(chatUserId);
@@ -193,10 +197,7 @@ public class ChatFragment extends Fragment {
             messagesReference.child(currentUserId).child(chatUserId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    isTeacher = dataSnapshot.child("isTeacher").getValue(boolean.class);
-                    if (isTeacher) {
-                        imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
-                    }
+                    imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
                     fullname = dataSnapshot.child("fullname").getValue(String.class);
                     ChatToken = dataSnapshot.child("fcmToken").getValue(String.class);
                     Log.d("YAZAN", "onDataChange: FullNAME IS " + fullname);
@@ -209,12 +210,13 @@ public class ChatFragment extends Fragment {
 
                 }
             });
-            Log.d("YAZAN", "onDataChange: FullNAME IS 2" + fullname);
         }
 
 
-        Log.d("YAZAN ChatAcitvity", "current user is: " + currentUserId);
-        Log.d("YAZAN ChatAcitvity", "chat user is: " + chatUserId);
+        Log.d("YAZAN", "Chat: current user is: " + currentUserId);
+        Log.d("YAZAN", "Chat: chat user is: " + chatUserId);
+
+
         // Setup ----------------------------------------------------------------------------------------
         recyclerView = view.findViewById(R.id.recyclerView);
         messageInputLayout = view.findViewById(R.id.messageEditText);
@@ -228,32 +230,33 @@ public class ChatFragment extends Fragment {
         loadMessages();
         // Alarm ----------------------------------------------------------------------------------
 
+        ObjectSerialization objectSerialization = new ObjectSerialization(requireContext(), chatUserId);
 
-        sharedPreferences = requireContext().getSharedPreferences("Alarms", Context.MODE_PRIVATE);
-        String savedDateTime = sharedPreferences.getString(chatUserId, null);
-        if (sharedPreferences.contains(chatUserId)) {
-            selectedDateTimeTextView.setText("נקבע שיעור ב "+ savedDateTime);
+
+        if (objectSerialization.AlarmExist()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+            selectedDateTimeTextView.setText("נקבע שיעור ב "+ dateFormat.format(objectSerialization.getAlarm().getCalendar().getTime()));
+            Log.d("YAZAN", "AAAAA:  " + ("נקבע שיעור ב "+  dateFormat.format(objectSerialization.getAlarm().getCalendar().getTime())));
             timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
         }else {
             timerButton.setBackgroundResource(R.drawable.round_timer_24);
-
         }
+
 
         timerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
 
-                if (!sharedPreferences.contains(chatUserId)) {
+                if (!objectSerialization.AlarmExist()) {
                     Log.d("YAZAN", "Alarm: No alarm is set, launching date picker.");
                     if (checkNotificationPermissions()) {
                         showDateTimePickerDialog();
                     }
                 } else {
                     Log.d("YAZAN", "Alarm: Canceled Alarm");
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove(chatUserId);
-                    editor.apply();
+                    objectSerialization.removeAlarm();
                     timerButton.setBackgroundResource(R.drawable.round_timer_24);
                     selectedDateTimeTextView.setText("לא נקבע שיעור");
                     Toast.makeText(requireContext(), "השיעור בוטל", Toast.LENGTH_SHORT).show();
@@ -263,14 +266,12 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        // Register BroadcastReceiver to listen for broadcasts
+        // כאשר ההתראה מופעלת נשלחת פקודה למחוק את הUI של הזמן
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d("YAZAN", "Alarm: alarm received, deleting from ui.");
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove(chatUserId);
-                editor.apply();
+                objectSerialization.removeAlarm();
                 timerButton.setBackgroundResource(R.drawable.round_timer_24);
                 selectedDateTimeTextView.setText("לא נקבע שיעור");
             }
@@ -430,6 +431,7 @@ public class ChatFragment extends Fragment {
         timePicker.setIs24HourView(true); // Set 24-hour format
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int year = datePicker.getYear();
@@ -441,27 +443,20 @@ public class ChatFragment extends Fragment {
                 // Handle the selected date and time
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, month, dayOfMonth, hourOfDay, minute);
-
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-                String selectedDateTime = dateFormat.format(calendar.getTime());
-                selectedDateTimeTextView.setText("נקבע שיעור ב "+ selectedDateTime);
-                timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
-                Toast.makeText(requireContext(), "נקבע שיעור! " , Toast.LENGTH_SHORT).show();
+                Alarm alarm = new Alarm(calendar,chatUserId,fullname);
 
 
-                // Check if an alarm is already set for this chatUserId
-                sharedPreferences = requireContext().getSharedPreferences("Alarms", Context.MODE_PRIVATE);
-                if (!sharedPreferences.contains(chatUserId)) {
-                    // Save the alarm for this chatUserId
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(chatUserId, selectedDateTime);
-                    editor.apply();
 
-                    // Schedule the alarm
-                    setAlarm(calendar, fullname);
+
+                if (alarm.setAlarm(requireContext(), alarm)) {
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+                    selectedDateTimeTextView.setText("נקבע שיעור ב "+ dateFormat.format(calendar.getTime()));
+                    timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
+                    Toast.makeText(requireContext(), "נקבע שיעור! " , Toast.LENGTH_SHORT).show();
+
                 } else {
                     // Inform the user that an alarm is already set
-                    Log.d("YAZAN", "setAlarm: alarm already set for the user");
                     Toast.makeText(requireContext(), "נקבע כבר שיעור, מחק את השיעור הנוכחי", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -473,34 +468,15 @@ public class ChatFragment extends Fragment {
         dialog.show();
     }
 
-    private void setAlarm(Calendar calendar, String fullname) {
-        // Subtract 5 minutes from the selected time
-        calendar.add(Calendar.MINUTE, -5);
-
-        AlarmManager alarmManager = (AlarmManager) requireContext().getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(requireContext(), AlarmReceiver.class);
-        intent.putExtra("fullname", fullname); // Pass fullname to the receiver
-        intent.putExtra("chatUserId", chatUserId); // Pass chatUserId to the receiver
-
-        int requestCode = 123; // Unique request code, you can define your own
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(requireContext(), requestCode, intent, PendingIntent.FLAG_MUTABLE);
-
-        if (alarmManager != null) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-            Log.d("YAZAN", "setAlarm: alarm set");
-
-        }
-    }
-
-
     public boolean checkNotificationPermissions() {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());
         boolean areNotificationsEnabled = notificationManager.areNotificationsEnabled();
 
         if (areNotificationsEnabled) {
-            Log.d("YAZAN", "Alarm: checkNotificationPermissions: " + areNotificationsEnabled);
+            Log.d("YAZAN", "[+] Alarm: Notifications are allowed.");
             return true;
         } else {
+            Log.d("YAZAN", "[*] Alarm: Notifications are not allowed, asking for them.");
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_NOTIFICATION);
             areNotificationsEnabled = notificationManager.areNotificationsEnabled();
             if (areNotificationsEnabled) {

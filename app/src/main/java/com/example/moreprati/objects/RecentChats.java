@@ -5,27 +5,20 @@ import java.util.Calendar;
 public class RecentChats {
     private String fullname;
     private String imageUrl;
-    private boolean isTeacher;
+
     private String lastMessage;
     private String chatUserId;
     public RecentChats() {
         // Default constructor required for Firebase
     }
 
-    public RecentChats(String lastMessage, boolean isTeacher, String fullname, String imageUrl, String chatUserId) {
+    public RecentChats(String lastMessage, String fullname, String imageUrl, String chatUserId) {
         this.lastMessage = lastMessage;
-        this.isTeacher = isTeacher;
         this.fullname = fullname;
         this.imageUrl = imageUrl;
         this.chatUserId = chatUserId;
     }
-    public boolean getIsTeacher() {
-        return isTeacher;
-    }
 
-    public void setIsTeacher(boolean isTeacher) {
-        this.isTeacher = isTeacher;
-    }
     public String getFullname() {
         return fullname;
     }

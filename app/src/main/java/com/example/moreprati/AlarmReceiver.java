@@ -19,8 +19,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
         String fullname = intent.getStringExtra("fullname");
         String chatUserId = intent.getStringExtra("chatUserId");
+        Log.d("YAZAN", "[*] Alarm Received: for: " + fullname + " with uid: " + chatUserId);
+
         SharedPreferences sharedPreferences = context.getSharedPreferences("Alarms", Context.MODE_PRIVATE);
 
         // Check if the alarm is deleted
@@ -37,6 +40,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             //Send notification
             showNotification(context, fullname);
+            Log.d("YAZAN", "[*] Alarm Received: Notification sent for alarm regarding: " + fullname + " with uid: " + chatUserId);
         }
     }
 
@@ -63,7 +67,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Show the notification
         notificationManager.notify(1, notification);
 
-        Log.d("Yazan", "showNotification:nofitication sent");
+
 
     }
 }

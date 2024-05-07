@@ -6,16 +6,19 @@ public class Student {
     private String mail;
     private String city;
     private String uid;
+    private String image;
 
     private String fcmToken;
 
-    // Default constructor required for DataSnapshot.getValue(User.class)
-    public Student() {}
-    public Student (String fullname, String mail, String city, String uid, String fcmToken) {
+    public Student() { // Default constructor required for DataSnapshot.getValue(User.class)
+
+    }
+    public Student (String fullname, String mail, String city, String uid, String fcmToken, String image) {
         this.city = city;
         this.fullname = fullname;
         this.mail = mail;
         this.uid = uid;
+        this.image = image;
         this.fcmToken = fcmToken;
     }
 
@@ -58,5 +61,13 @@ public class Student {
 
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

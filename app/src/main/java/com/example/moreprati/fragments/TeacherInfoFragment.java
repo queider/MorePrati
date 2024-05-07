@@ -63,10 +63,9 @@ public class TeacherInfoFragment extends Fragment {
             fcmToken = args.getString("fcmToken");
         }
 
-        // Set values to views
+        RatingBar displayedRating = view.findViewById(R.id.displayedRating);
         ImageView profileImageView = view.findViewById(R.id.profilePic);
         TextView fullnameTextView = view.findViewById(R.id.fullname);
-        TextView ratingTextView = view.findViewById(R.id.rating);
         TextView wayOfLearningTextView = view.findViewById(R.id.wayOfLearning);
         TextView pricePerHourTextView = view.findViewById(R.id.pricePerHour);
         TextView cityTextView = view.findViewById(R.id.city);
@@ -79,7 +78,7 @@ public class TeacherInfoFragment extends Fragment {
 
         // Set values to TextViews
         fullnameTextView.setText(fullname);
-        ratingTextView.setText(String.valueOf(rating));
+        displayedRating.setRating(rating);
         wayOfLearningTextView.setText(wayOfLearning);
         pricePerHourTextView.setText(String.valueOf(pricePerHour));
         cityTextView.setText(city);
@@ -134,7 +133,7 @@ public class TeacherInfoFragment extends Fragment {
 
                 if (lastRatingDate.equals(currentDate)) {
                     // User already rated for the day, show toast
-                    Toast.makeText(requireContext(), "You have already rated for today", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "תוכל לדרג פעם אחת ביום", Toast.LENGTH_SHORT).show();
                 } else {
                     // Update the last rating date in SharedPreferences
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -152,7 +151,7 @@ public class TeacherInfoFragment extends Fragment {
                             float newRating = calculateNewRating(currentRating, howManyRated, userRating);
                             int newHowManyRated = howManyRated + 1;
 
-                            ratingTextView.setText(String.valueOf(newRating));
+                            displayedRating.setRating(newRating);
 
 
                             // Step 3: Update the values in Firebase
