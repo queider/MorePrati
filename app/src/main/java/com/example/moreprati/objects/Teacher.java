@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Teacher {
     private String fullname;
-    private String mail; // this is an email
+    private String email; // this is an email
     private String city;
     private String uid;
 
@@ -16,21 +16,23 @@ public class Teacher {
     private int pricePerHour;
 
     private String description;
-    private String image;
+    private String imageUrl;
 
     private float rating;
     private int howManyRated;
 
     private String fcmToken;
 
-    // Default constructor required for Firebase
+
     public Teacher() {
+        // Default constructor required for Firebase
+
     }
 
-    public Teacher(String fullname, String mail, String city, String uid, Map<String, Boolean> subjects, Map<String, Boolean> citySubjects,
-                   String wayOfLearning, int pricePerHour, String description, String image,String fcmToken) {
+    public Teacher(String fullname, String email, String city, String uid, Map<String, Boolean> subjects, Map<String, Boolean> citySubjects,
+                   String wayOfLearning, int pricePerHour, String description, String imageUrl,String fcmToken) {
         this.fullname = fullname;
-        this.mail = mail;
+        this.email = email;
         this.city = city;
         this.uid = uid;
         this.subjects = subjects;
@@ -38,7 +40,7 @@ public class Teacher {
         this.wayOfLearning = wayOfLearning;
         this.pricePerHour = pricePerHour;
         this.description = description;
-        this.image = image;
+        this.imageUrl = imageUrl;
         this.rating = 0;
         this.howManyRated = 0;
         this.fcmToken = fcmToken;
@@ -54,12 +56,12 @@ public class Teacher {
         this.fullname = fullname;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setEmail(String mail) {
+        this.email = email;
     }
 
     public String getCity() {
@@ -121,12 +123,12 @@ public class Teacher {
         this.description = description;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public float getRating() {
@@ -151,6 +153,7 @@ public class Teacher {
     public void setHowManyRated(int howManyRated) {
         this.howManyRated = howManyRated;
     }
+
 
 
 }

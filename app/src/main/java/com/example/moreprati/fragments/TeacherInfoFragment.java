@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.example.moreprati.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,12 +43,13 @@ public class TeacherInfoFragment extends Fragment {
     private int pricePerHour;
     private String description;
     private String imageUrl;
-    private int rating;
+    private float rating;
     private String fcmToken;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_teacher_info, container, false);
+
 
         Bundle args = getArguments();
         if (args != null) {
@@ -59,7 +61,7 @@ public class TeacherInfoFragment extends Fragment {
             pricePerHour = args.getInt("pricePerHour", 0);
             description = args.getString("description");
             imageUrl = args.getString("imageUrl");
-            rating = args.getInt("rating", 0);
+            rating = args.getFloat("rating", 0);
             fcmToken = args.getString("fcmToken");
         }
 
@@ -120,7 +122,13 @@ public class TeacherInfoFragment extends Fragment {
             }
         });
 
-
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+        boolean isTeacher = sharedPreferences.getBoolean("isTeacher", true);
+        if (isTeacher) {
+            MaterialCardView cardView = view.findViewById(R.id.ratingCard);
+            cardView.setVisibility(View.GONE);
+            makeContact.setVisibility(View.GONE);
+        }
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float userRating, boolean fromUser) {
@@ -186,14 +194,17 @@ public class TeacherInfoFragment extends Fragment {
 
     // Additional methods or overrides can be added as needed
     private float calculateNewRating(float currentRating, int howManyRated, float userRating) {
-        // Your logic to calculate the new rating based on the current rating,
-        // number of ratings, and the user's new rating
-        // For example, a simple average:
-        float newRating = ((currentRating * howManyRated) + userRating) / (howManyRated + 1);
+        // Define weights for the current rating and the user's new rating
+        float currentWeight = (float) howManyRated / (howManyRated + 1);
+        float userWeight = 1.0f / (howManyRated + 1);
+
+        // Calculate the weighted average of the current rating and the user's new rating
+        float newRating = (currentRating * currentWeight) + (userRating * userWeight);
 
         // Round to one digit after the decimal point
         newRating = Math.round(newRating * 10.0f) / 10.0f;
 
         return newRating;
     }
+
 }

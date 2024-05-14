@@ -76,6 +76,10 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:textDirection="rtl"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -84,21 +88,25 @@
 
     <com.google.android.material.textfield.TextInputLayout
         style="?attr/textInputFilledStyle"
-        android:id="@+id/mail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
         android:layout_marginBottom="30dp"
         android:hint="אימייל"
         app:startIconDrawable="@drawable/baseline_email_24"
+        android:id="@+id/email"
 
 
 
         >
 
         <com.google.android.material.textfield.TextInputEditText
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textWebEmailAddress"
+            android:textDirection="rtl"
+            android:fontFamily="@font/heebo_variablefont_wght"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -120,6 +128,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
+            android:fontFamily="@font/heebo_variablefont_wght"
 
             />
 
@@ -144,6 +153,7 @@
             android:completionThreshold="1"
             android:inputType="none"
             android:hint="עיר מגורים"
+            android:fontFamily="@font/heebo_variablefont_wght"
 
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -156,6 +166,7 @@
         <!-- Other views or layout elements -->
 
         <Button
+
             android:layout_margin="30dp"
             android:id="@+id/studentSignUp"
             android:layout_width="wrap_content"
@@ -163,6 +174,7 @@
             android:text="הרשם"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
+            android:fontFamily="@font/heebo_variablefont_wght"
             /> <!-- Align to the end (right side) of the parent RelativeLayout -->
 
     </RelativeLayout>

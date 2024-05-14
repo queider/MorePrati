@@ -9,9 +9,5 @@
         android:id="@+id/action_chat"
         android:icon="@drawable/baseline_chat_24"
         android:title="צ'טים" />
-    <item
-        android:id="@+id/action_about"
-        android:icon="@drawable/baseline_info_24"
-        android:title="אודות"/>
 
 </menu>

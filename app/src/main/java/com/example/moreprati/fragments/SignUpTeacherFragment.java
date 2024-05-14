@@ -40,6 +40,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 
 import com.google.firebase.auth.EmailAuthProvider;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -58,10 +59,10 @@ import java.util.regex.Matcher;
 public class SignUpTeacherFragment extends Fragment {
     private FirebaseAuth mAuth = FirebaseAuth.getInstance(); // firebase thing
     SubjectMapper subjectMapper = new SubjectMapper();
-    Map<String, Boolean> subjectMap;
+    private Map<String, Boolean> subjectMap;
 
-    Map<String, Boolean> CitySubjectMap;
-    private MultiAutoCompleteTextView multiAutoCompleteTextView;
+    private Map<String, Boolean> CitySubjectMap;
+
 
 
     //profile pic
@@ -73,11 +74,11 @@ public class SignUpTeacherFragment extends Fragment {
 
     //varablbes ----------
     private String fullname;
-    private String mail;
+    private String email;
     private String password;
     private String city;
 
-    private String[] subjects = new String[0];
+    private String[] subjectsArray = new String[0];
 
     private String wayOfLearningString;
     private int pricePerHour = 0;
@@ -119,26 +120,20 @@ public class SignUpTeacherFragment extends Fragment {
         ArrayAdapter<String> adapterCity = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cities);
         cityMenu.setAdapter(adapterCity);
 
-        // Register buttons
-
-
-
-
-
         // subjects setups -------------------------------------------------------
 
-        multiAutoCompleteTextView = view.findViewById(R.id.subjects);
-        String[] suggestions = new String[]{"מתמטיקה", "עברית", "אנגלית", "גיטרה", "פסנתר"};
-        ArrayAdapter<String> adapterSubjects = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestions);
-        multiAutoCompleteTextView.setAdapter(adapterSubjects);
-        multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+        MultiAutoCompleteTextView subjectsMenu = view.findViewById(R.id.subjects);
+        String[] subjectsMenuSuggestions = res.getStringArray(R.array.subjects);
+        ArrayAdapter<String> adapterSubjectsMenu = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, subjectsMenuSuggestions);
+        subjectsMenu.setAdapter(adapterSubjectsMenu);
+        subjectsMenu.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
 
 
         // Setup AutoCompleteTextView wayOfLearning --------------------------------------------------
-        AutoCompleteTextView wayOfLearning = view.findViewById(R.id.wayOfLearning);
-        String[] suggestionsWayOfLearning = new String[]{"פרונטלי", "מרוחק", "מרוחק ופרונטלי"};
-        ArrayAdapter<String> adapterWayOfLearning = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, suggestionsWayOfLearning);
-        wayOfLearning.setAdapter(adapterWayOfLearning);
+        AutoCompleteTextView wayOfLearningMenu = view.findViewById(R.id.wayOfLearning);
+        String[] wayOfLearningSuggestions = new String[]{"פרונטלי", "מרוחק", "מרוחק ופרונטלי"};
+        ArrayAdapter<String> adapterWayOfLearning = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, wayOfLearningSuggestions);
+        wayOfLearningMenu.setAdapter(adapterWayOfLearning);
 
         // Signup button ----------------------------------------------------------------------------
         Button SignupButton = view.findViewById(R.id.signUp);
@@ -152,10 +147,10 @@ public class SignUpTeacherFragment extends Fragment {
                     fullname = fullnameEditText.getText().toString();
                 }
 
-                TextInputLayout mailLayout = view.findViewById(R.id.mail);
-                EditText mailEditText = mailLayout.getEditText();
-                if (mailEditText != null) {
-                    mail = mailEditText.getText().toString();
+                TextInputLayout emailLayout = view.findViewById(R.id.email);
+                EditText emailEditText = emailLayout.getEditText();
+                if (emailEditText != null) {
+                    email = emailEditText.getText().toString();
                 }
 
                 TextInputLayout passwordLayout = view.findViewById(R.id.password);
@@ -181,13 +176,13 @@ public class SignUpTeacherFragment extends Fragment {
                 }
 
 
-                String text = multiAutoCompleteTextView.getText().toString();
-                wayOfLearningString = wayOfLearning.getText().toString();
+                String text = subjectsMenu.getText().toString();
+                wayOfLearningString = wayOfLearningMenu.getText().toString();
                 city = cityMenu.getText().toString();
 
                 if (!text.isEmpty()) {
-                    subjects = processString(text);
-                    subjectMap = SubjectMapper.mapSubjects(subjects);
+                    subjectsArray = processString(text);
+                    subjectMap = SubjectMapper.mapSubjects(subjectsArray, requireContext());
 
                     // log the values of the map
                     for (Map.Entry<String, Boolean> entry : subjectMap.entrySet()) {
@@ -195,7 +190,7 @@ public class SignUpTeacherFragment extends Fragment {
 
                     }
 
-                    CitySubjectMap = SubjectMapper.mapCitySubjects(subjects, city);
+                    CitySubjectMap = SubjectMapper.mapCitySubjects(subjectsArray, city,requireContext());
                 }
 
 
@@ -240,23 +235,23 @@ public class SignUpTeacherFragment extends Fragment {
 
 
     private void registerTeacher() {
-        Log.d("YAZAN", "registerTeacher: " + mail);
+        Log.d("YAZAN", "registerTeacher: " + email);
         Log.d("YAZAn", "registerTeacher: " + password);
 
-        mAuth.createUserWithEmailAndPassword(mail, password)
+        mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
+                            Log.d(TAG, "createUserWithemail:success");
                             Toast.makeText(getContext(), "ההרשמה בוצעה בהצלחה", Toast.LENGTH_SHORT).show();
                             uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                             // Reauthenticate the user before uploading the profile picture
-                            reauthenticateUser(mail, password);
+                            reauthenticateUser(email, password);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            Log.w(TAG, "createUserWithemail:failure", task.getException());
                             Toast.makeText(getContext(), "ההרשמה כשלה / משתמש קיים", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -280,7 +275,7 @@ public class SignUpTeacherFragment extends Fragment {
     }
 
     private void proceedWithLinking() {
-        Teacher teacher = new Teacher(fullname, mail, city, uid, subjectMap, CitySubjectMap,wayOfLearningString, pricePerHour, description, profilePicUri, fcmToken);
+        Teacher teacher = new Teacher(fullname, email, city, uid, subjectMap, CitySubjectMap,wayOfLearningString, pricePerHour, description, profilePicUri, fcmToken);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         usersRef.child(uid).setValue(teacher)
                 .addOnCompleteListener(task -> {
@@ -305,15 +300,16 @@ public class SignUpTeacherFragment extends Fragment {
         editor.putBoolean("isTeacher", true);
         editor.putString("fullname", teacher.getFullname());
         editor.putString("uid", teacher.getUid());
-        editor.putString("image", teacher.getImage());
+        editor.putString("imageUrl", teacher.getImageUrl());
         editor.putString("fcmToken", fcmToken);
+
 
         editor.apply();
     }
 
     private boolean validation() {
 
-        if( fullname.isEmpty() || mail.isEmpty() || city.isEmpty() || subjectMap.isEmpty() || wayOfLearningString.isEmpty() || pricePerHour == 0 || description.isEmpty() || subjects[0] == null) {
+        if( fullname.isEmpty() || email.isEmpty() || city.isEmpty() || subjectMap.isEmpty() || wayOfLearningString.isEmpty() || pricePerHour == 0 || description.isEmpty() || subjectsArray[0] == null) {
             Toast.makeText(getContext(), "מלא את כל השדות", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -323,21 +319,26 @@ public class SignUpTeacherFragment extends Fragment {
             return false;
         }
 
+        if(subjectsArray.length > 3) {
+            Toast.makeText(getContext(), "ניתן לבחור עד 4 מ", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         if (fullname.length() < 4){
             Toast.makeText(getContext(), "שם מלא קצר מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // בדיקה של פורמט האיימיל
-        final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
-        Pattern pattern = Pattern.compile(EMAIL_REGEX, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(mail);
+        final String email_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
+        Pattern pattern = Pattern.compile(email_REGEX, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
         if(!matcher.matches()){
             Toast.makeText(getContext(), "אימייל לא בפורמט הנכון", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        if (mail.length() > 30){
+        if (email.length() > 30){
             Toast.makeText(getContext(), "אימייל ארוך מידי", Toast.LENGTH_SHORT).show();
             return false;
         }

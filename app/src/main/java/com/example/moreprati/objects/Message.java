@@ -4,7 +4,6 @@ public class Message {
 
     private String messageText;
     private String sender;
-    private String reciver;
 
 
     // Empty constructor required for Firebase
@@ -12,10 +11,9 @@ public class Message {
         // Default constructor required for Firebase
     }
 
-    public Message(String messageText, String sender, String reciver) {
+    public Message(String messageText, String sender) {
         this.messageText = messageText;
         this.sender = sender;
-        this.reciver = reciver;
     }
 
     public String getMessageText() {
@@ -32,14 +30,6 @@ public class Message {
 
     public void setSedner(String sedner) {
         this.sender = sender;
-    }
-
-    public String getReciver() {
-        return reciver;
-    }
-
-    public void setReciver(String reciver) {
-        this.reciver = reciver;
     }
 
 

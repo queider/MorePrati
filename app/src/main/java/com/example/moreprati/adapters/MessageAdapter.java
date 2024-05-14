@@ -4,6 +4,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,11 +15,12 @@ import com.example.moreprati.objects.Message;
 import com.example.moreprati.R;
 
 import java.util.List;
-
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
     private List<Message> messages;
     private String currentUserId;
+    private FrameLayout messageLayout;
+
 
     public MessageAdapter(List<Message> messages, String currentUserId) {
         this.currentUserId = currentUserId;
@@ -47,22 +50,33 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
+            messageLayout = itemView.findViewById(R.id.messageLayout);
             messageTextView = itemView.findViewById(R.id.messageTextView);
+
         }
 
         public void bind(Message message, String currentUserId) {
             messageTextView.setText(message.getMessageText());
 
-            // Set background based on the sender's UID
             String senderUid = message.getSender();
             if (senderUid.equals(currentUserId)) {
-                messageTextView.setBackgroundResource(R.drawable.receiver_bubble);
-                // Set other properties for the sender's bubble
-                messageTextView.setGravity(Gravity.END); // Align text to the end (right) of the view
-            }else {
                 messageTextView.setBackgroundResource(R.drawable.sender_bubble);
-                // Set other properties for the receiver's bubble
+                updateGravity(Gravity.END);
+
+
+            } else {
+                messageTextView.setBackgroundResource(R.drawable.receiver_bubble);
+                updateGravity(Gravity.START);
+
             }
         }
+
+        private void updateGravity(int gravity) {
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) messageTextView.getLayoutParams();
+            layoutParams.gravity = gravity;
+            messageTextView.setLayoutParams(layoutParams);
+        }
+
+
     }
 }

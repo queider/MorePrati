@@ -1,5 +1,6 @@
 package com.example.moreprati.adapters;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,90 +12,66 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.moreprati.R;
-import com.example.moreprati.objects.RecentChats;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
+
+import com.example.moreprati.objects.RecentChat;
 import com.squareup.picasso.Picasso;
 
-public class RecentChatsAdapter extends FirebaseRecyclerAdapter<RecentChats, RecentChatsAdapter.RecentChatsViewHolder> {
-    private RecentChatsAdapter.OnItemClickListener listener;
-
+import java.util.ArrayList;
+import java.util.List;
+public class RecentChatsAdapter extends RecyclerView.Adapter<RecentChatsAdapter.RecentChatsViewHolder> {
+    private List<RecentChat> recentChatList = new ArrayList<>();
+    private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(String chatUserId);  // Pass any necessary data for the new activity
-    }
-    @Override
-    public void onDataChanged() {
-        super.onDataChanged();
-        // This method will be called when there are changes in the data
-        // You can perform additional tasks if needed
-
-        // For example, you can log a message
-        Log.d("YAZAN", "onDataChanged: Data set changed");
-
-        // Or you can update UI, show/hide views, etc.
-        // For instance, you might want to display a message when there are no items
-        if (getItemCount() == 0) {
-            // Handle the case when there are no items
-        }
+        void onItemClick(RecentChat recentChat);
     }
 
-    public RecentChatsAdapter(@NonNull FirebaseRecyclerOptions<RecentChats> options, OnItemClickListener listener) {
-        super(options);
+    public RecentChatsAdapter(OnItemClickListener listener) {
         this.listener = listener;
     }
 
+    public void addRecentChat(RecentChat recentChat) {
+        recentChatList.add(recentChat);
+        notifyItemInserted(recentChatList.size() - 1);
+    }
 
     @NonNull
     @Override
     public RecentChatsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("YAZAN", "onCreateViewHolder");
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recent_chats_item, parent, false);
         return new RecentChatsViewHolder(view);
     }
 
-
     @Override
-    protected void onBindViewHolder(@NonNull RecentChatsViewHolder holder, int position, @NonNull RecentChats model) {
-        Log.d("YAZAN", "onBindViewHolder for position: " + position);
-
-        if (position >= 0 && model != null) {
-            holder.chatUserName.setText(model.getFullname());
-            String lastMessage = model.getLastMessage();
-            if (lastMessage != null) {
-                if (lastMessage.length() > 20) {
-                    lastMessage = lastMessage.substring(0, 17) + "...";
-                }
-            }
-
-            holder.lastMessage.setText(lastMessage);
-
-            Picasso.get()
-                    .load(model.getImageUrl())
-                    .placeholder(R.drawable.default_profile_pic)
-                    .error(R.drawable.default_profile_pic)
-                    .into(holder.image);
-
-            holder.itemView.setOnClickListener(v -> {
-                Log.d("YAZAN", "onBindViewHolder: ChatUserID is " + model.getChatUserId());
-                listener.onItemClick(model.getChatUserId());
-            });
-        }
+    public void onBindViewHolder(@NonNull RecentChatsViewHolder holder, int position) {
+        RecentChat recentChat = recentChatList.get(position);
+        holder.chatUserName.setText(recentChat.getFullname());
+        Picasso.get()
+                .load(recentChat.getImageUrl())
+                .placeholder(R.drawable.default_profile_pic)
+                .error(R.drawable.default_profile_pic)
+                .into(holder.image);
+        holder.lastMessage.setText(recentChat.getLastMessage());
+        holder.lastMessage.setMaxLines(1); // Set maximum lines to 1
+        holder.lastMessage.setEllipsize(TextUtils.TruncateAt.END); // Truncate text if it's too long
+        holder.itemView.setOnClickListener(v -> listener.onItemClick(recentChat));
     }
 
-
+    @Override
+    public int getItemCount() {
+        return recentChatList.size();
+    }
 
     public static class RecentChatsViewHolder extends RecyclerView.ViewHolder {
         TextView chatUserName;
-        TextView lastMessage;
-
         ImageView image;
+        TextView lastMessage;
 
         public RecentChatsViewHolder(@NonNull View itemView) {
             super(itemView);
-            lastMessage = itemView.findViewById(R.id.lastMessage);
             chatUserName = itemView.findViewById(R.id.chatUserName);
             image = itemView.findViewById(R.id.image);
+            lastMessage = itemView.findViewById(R.id.lastMessage);
         }
     }
 }

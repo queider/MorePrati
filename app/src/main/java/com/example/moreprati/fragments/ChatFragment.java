@@ -54,8 +54,12 @@ import com.example.moreprati.objects.Message;
 import com.example.moreprati.R;
 import com.example.moreprati.adapters.MessageAdapter;
 import com.example.moreprati.objects.ObjectSerialization;
+import com.example.moreprati.objects.RecentChat;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -106,14 +110,14 @@ public class ChatFragment extends Fragment {
     private Button sendButton;
 
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference messagesReference;
+    private DatabaseReference chatsReference;
     private String currentUserId;
     private String chatUserId;
 
     private String fullname;
     private String imageUrl;
 
-    private String ChatToken;
+    private String chatToken;
     private ImageView imageView;
 
     private TextView textView;
@@ -133,8 +137,9 @@ public class ChatFragment extends Fragment {
     SharedPreferences sharedPreferences ;
     private BroadcastReceiver receiver;
 
+    private String chatName;
 
-
+    private String userImageUrl;
     @SuppressLint("SetTextI18n")
     @Nullable
     @Override
@@ -153,16 +158,18 @@ public class ChatFragment extends Fragment {
         textView = view.findViewById(R.id.fullname);
         //firebase:
         firebaseAuth = FirebaseAuth.getInstance();
-        messagesReference = FirebaseDatabase.getInstance().getReference().child("Messages");
+        chatsReference = FirebaseDatabase.getInstance().getReference().child("Chats");
 
         // Get users info ------------------------------------------------------------------------------
 
         sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+
         currentUserId = sharedPreferences.getString("uid", "");
+        userImageUrl = sharedPreferences.getString("imageUrl", "");
+
 
         Bundle args = getArguments();
 
-        currentUserId = sharedPreferences.getString("uid", "");
 
         if (args != null && args.getBoolean("cameFromTeacherInfo", false)) {
 
@@ -170,51 +177,28 @@ public class ChatFragment extends Fragment {
             chatUserId = args.getString("uid");
             imageUrl = args.getString("imageUrl");
             fullname = args.getString("fullname");
-            ChatToken = args.getString("fcmToken");
-            textView.setText(fullname);
-            Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
+            chatToken = args.getString("fcmToken");
+            chatName = chatUserId +"_"+ currentUserId;
 
 
-            //my info
-            messagesReference.child(chatUserId).child(currentUserId).child("fullname").setValue(sharedPreferences.getString("fullname", ""));
-            messagesReference.child(chatUserId).child(currentUserId).child("fcmToken").setValue(sharedPreferences.getString("fcmToken", ""));
-            messagesReference.child(chatUserId).child(currentUserId).child("chatUserId").setValue(currentUserId);
-            messagesReference.child(chatUserId).child(currentUserId).child("imageUrl").setValue(sharedPreferences.getString("image", ""));
 
-            //chat user info
-            messagesReference.child(currentUserId).child(chatUserId).child("fullname").setValue(fullname);
-            messagesReference.child(currentUserId).child(chatUserId).child("imageUrl").setValue(imageUrl);
-            messagesReference.child(currentUserId).child(chatUserId).child("fcmToken").setValue(ChatToken);
-            messagesReference.child(currentUserId).child(chatUserId).child("chatUserId").setValue(chatUserId);
+
 
         } else {
-            Bundle argsFromRc = getArguments();
-            chatUserId = argsFromRc.getString("chatUserIdFromRecentChats");
 
-            Log.d("YAZAN ", "current user is (from RC): " + currentUserId);
-            Log.d("YAZAN ", "chat user is: (from RC)" + chatUserId);
+            RecentChat PressedRecentChat = (RecentChat) getArguments().getSerializable("recentChat");
+            chatUserId = PressedRecentChat.getChatUserId();
+            imageUrl = PressedRecentChat.getImageUrl();
+            fullname = PressedRecentChat.getFullname();
+            chatName = PressedRecentChat.getChatName();
+            chatToken = PressedRecentChat.getFcmToken();
 
-            messagesReference.child(currentUserId).child(chatUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    imageUrl = dataSnapshot.child("imageUrl").getValue(String.class);
-                    fullname = dataSnapshot.child("fullname").getValue(String.class);
-                    ChatToken = dataSnapshot.child("fcmToken").getValue(String.class);
-                    Log.d("YAZAN", "onDataChange: FullNAME IS " + fullname);
-                    textView.setText(fullname);
-                    Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
         }
+        textView.setText(fullname);
+        Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
 
 
-        Log.d("YAZAN", "Chat: current user is: " + currentUserId);
-        Log.d("YAZAN", "Chat: chat user is: " + chatUserId);
+
 
 
         // Setup ----------------------------------------------------------------------------------------
@@ -230,14 +214,14 @@ public class ChatFragment extends Fragment {
         loadMessages();
         // Alarm ----------------------------------------------------------------------------------
 
+
+
+
         ObjectSerialization objectSerialization = new ObjectSerialization(requireContext(), chatUserId);
-
-
         if (objectSerialization.AlarmExist()) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault());
 
             selectedDateTimeTextView.setText("נקבע שיעור ב "+ dateFormat.format(objectSerialization.getAlarm().getCalendar().getTime()));
-            Log.d("YAZAN", "AAAAA:  " + ("נקבע שיעור ב "+  dateFormat.format(objectSerialization.getAlarm().getCalendar().getTime())));
             timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
         }else {
             timerButton.setBackgroundResource(R.drawable.round_timer_24);
@@ -315,7 +299,7 @@ public class ChatFragment extends Fragment {
 
     private void loadMessages() {
 
-        messagesReference.child(currentUserId).child(chatUserId).child("Messages")
+        chatsReference.child(chatName).child("Messages")
                 .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
@@ -354,45 +338,43 @@ public class ChatFragment extends Fragment {
 
         if (!messageText.isEmpty()) {
 
-            Message message = new Message(messageText, currentUserId, chatUserId);
+            Message message = new Message(messageText, currentUserId);
 
 
-            messagesReference.child(currentUserId).child(chatUserId).child("Messages").push().setValue(message);
-            messagesReference.child(chatUserId).child(currentUserId).child("Messages").push().setValue(message);
-
-            messagesReference.child(currentUserId).child(chatUserId).child("lastMessage").setValue(message.getMessageText());
-            messagesReference.child(chatUserId).child(currentUserId).child("lastMessage").setValue(message.getMessageText());
+            chatsReference.child(chatName).child("Messages").push().setValue(message);
             messageEditText.setText("");
-            sendNotification(message.getMessageText());
+            sendNotification(message.getMessageText(), userImageUrl);
         }
     }
 
 
-    void sendNotification(String message) {
-
+    void sendNotification(String message, String imageUrl) {
         try {
             JSONObject jsonObject = new JSONObject();
             JSONObject notificationObj = new JSONObject();
             notificationObj.put("title", fullname);
             notificationObj.put("body", message);
+            notificationObj.put("imageUrl", imageUrl); // Add imageUrl to the notification payload
 
             JSONObject dataObj = new JSONObject();
             dataObj.put("userId", currentUserId);
 
             jsonObject.put("notification", notificationObj);
             jsonObject.put("data", dataObj);
-            jsonObject.put("to", ChatToken);
+            jsonObject.put("to", chatToken);
 
             callApi(jsonObject);
             Log.d("YAZAN Nofitication", "sendNotification: fullname:" + fullname);
             Log.d("YAZAN Nofitication", "sendNotification: message:" + message);
+            Log.d("YAZAN Nofitication", "sendNotification: imageUrl:" + imageUrl); // Log the imageUrl
 
             Log.d("YAZAN Nofitication", "sendNotification: currentUserId:" + currentUserId);
-            Log.d("YAZAN Nofitication", "sendNotification: ChatToken:" + ChatToken);
+            Log.d("YAZAN Nofitication", "sendNotification: ChatToken:" + chatToken);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
+
 
     void callApi(JSONObject jsonObject) {
         MediaType JSON = MediaType.get("application/json");
@@ -422,51 +404,43 @@ public class ChatFragment extends Fragment {
 
 
     private void showDateTimePickerDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_datetime_picker, null);
-        builder.setView(dialogView);
+        // Create a MaterialDatePicker for the date picker
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker().build();
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            // Extract selected date
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(selection);
 
-        DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
-        TimePicker timePicker = dialogView.findViewById(R.id.timePicker);
-        timePicker.setIs24HourView(true); // Set 24-hour format
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int year = datePicker.getYear();
-                int month = datePicker.getMonth();
-                int dayOfMonth = datePicker.getDayOfMonth();
-                int hourOfDay = timePicker.getHour();
+            // Create a MaterialTimePicker for the time picker
+            MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                    .setTimeFormat(TimeFormat.CLOCK_24H)
+                    .build();
+            timePicker.addOnPositiveButtonClickListener(view -> {
+                // Extract selected time
+                int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
 
                 // Handle the selected date and time
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, dayOfMonth, hourOfDay, minute);
-                Alarm alarm = new Alarm(calendar,chatUserId,fullname);
+                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                calendar.set(Calendar.MINUTE, minute);
 
-
-
-
+                Alarm alarm = new Alarm(calendar, chatUserId, fullname);
                 if (alarm.setAlarm(requireContext(), alarm)) {
-
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
-                    selectedDateTimeTextView.setText("נקבע שיעור ב "+ dateFormat.format(calendar.getTime()));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault());
+                    selectedDateTimeTextView.setText("נקבע שיעור ב " + dateFormat.format(calendar.getTime()));
                     timerButton.setBackgroundResource(R.drawable.baseline_alarm_off_24);
-                    Toast.makeText(requireContext(), "נקבע שיעור! " , Toast.LENGTH_SHORT).show();
-
+                    Toast.makeText(requireContext(), "נקבע שיעור! ", Toast.LENGTH_SHORT).show();
                 } else {
                     // Inform the user that an alarm is already set
                     Toast.makeText(requireContext(), "נקבע כבר שיעור, מחק את השיעור הנוכחי", Toast.LENGTH_SHORT).show();
                 }
-            }
+            });
+            timePicker.show(getChildFragmentManager(), "TimePicker");
         });
 
-        builder.setNegativeButton("Cancel", null);
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        datePicker.show(getChildFragmentManager(), "DatePicker");
     }
+
 
     public boolean checkNotificationPermissions() {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(requireContext());

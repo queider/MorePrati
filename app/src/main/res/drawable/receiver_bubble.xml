@@ -1,5 +1,5 @@
 <!-- res/drawable/receiver_bubble.xml -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <corners android:radius="8dp" />
-    <solid android:color="@color/design_default_color_secondary" /> <!-- Green color for receiver -->
+    <solid android:color="?attr/colorPrimaryContainer" /> <!-- Green color for receiver -->
 </shape>

@@ -168,26 +168,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:gravity="end"
+                android:orientation="horizontal"
+
+                >
 
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.Material3.CardView.Outlined"
-                    android:layout_width="300dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="45dp"
-                    android:layout_weight="6"
-                    app:cardCornerRadius="60dp">
+                    app:cardCornerRadius="60dp"
+                    android:id="@+id/ratingCard"
+                    >
 
-                    <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                    </RelativeLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
 
                         <RatingBar
                             android:id="@+id/ratingBar"
@@ -196,19 +189,10 @@
                             android:layout_gravity="center"
                             android:scaleX="0.7"
                             android:scaleY="0.7"
+                            android:layout_marginBottom="2dp"
 
                             />
-                    </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="225dp"
-                        android:fontFamily="@font/heebo_variablefont_wght"
-                        android:text="דרג: "
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
 
 
                 </com.google.android.material.card.MaterialCardView>
@@ -218,10 +202,11 @@
                     style="@style/Widget.Material3.Button.IconButton.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
-                    android:layout_weight="1"
                     android:fontFamily="@font/heebo_variablefont_wght"
                     android:text="צור קשר"
-                    android:textSize="17sp" />
+                    android:textSize="18sp"
+                    android:layout_gravity="end"
+                    />
 
 
             </LinearLayout>

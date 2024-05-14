@@ -43,13 +43,16 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class SignUpStudentFragment extends Fragment {
     private FirebaseAuth mAuth; // firebase thing
     private String uid;
     private String fcmToken;
     private String fullname;
-    private String mail;
+    private String email;
     private String city;
     private String password;
 
@@ -103,10 +106,10 @@ public class SignUpStudentFragment extends Fragment {
                     fullname = fullnameEditText.getText().toString();
                 }
 
-                TextInputLayout mailLayout = view.findViewById(R.id.mail);
-                EditText mailEditText = mailLayout.getEditText();
-                if (mailEditText != null) {
-                    mail = mailEditText.getText().toString();
+                TextInputLayout emailLayout = view.findViewById(R.id.email);
+                EditText emailEditText = emailLayout.getEditText();
+                if (emailEditText != null) {
+                    email = emailEditText.getText().toString();
                 }
 
                 TextInputLayout passwordLayout = view.findViewById(R.id.password);
@@ -131,7 +134,7 @@ public class SignUpStudentFragment extends Fragment {
 
     // Auth & Register in firebase
     private void registerStudent() {
-        mAuth.createUserWithEmailAndPassword(mail, password)
+        mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -143,7 +146,7 @@ public class SignUpStudentFragment extends Fragment {
                             uid = mAuth.getCurrentUser().getUid();
 
                             // Now you can link the user to additional information in the database
-                            reauthenticateUser(mail, password);
+                            reauthenticateUser(email, password);
                             startActivity(new Intent(requireContext(), MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.
@@ -170,7 +173,7 @@ public class SignUpStudentFragment extends Fragment {
     }
 
     private void proceedWithLinking() {
-        Student student = new Student(fullname, mail, city, uid, fcmToken, profilePicUri);
+        Student student = new Student(fullname, email, city, uid, fcmToken, profilePicUri);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Students");
         usersRef.child(uid).setValue(student)
                 .addOnCompleteListener(task -> {
@@ -194,7 +197,7 @@ public class SignUpStudentFragment extends Fragment {
         editor.putBoolean("isTeacher", false);
         editor.putString("fullname", student.getFullname());
         editor.putString("uid", student.getUid());
-        editor.putString("image", student.getImage());
+        editor.putString("imageUrl", student.getImageUrl());
         editor.putString("fcmToken", fcmToken);
         editor.apply();
 
@@ -252,8 +255,43 @@ public class SignUpStudentFragment extends Fragment {
 
     // form validation
     private boolean validation() {
-        // Add your validation logic here
 
-        return true; // For now, always return true for simplicity
+        if( fullname.isEmpty() || email.isEmpty() || city.isEmpty()) {
+            Toast.makeText(getContext(), "מלא את כל השדות", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (fullname.length() > 15){
+            Toast.makeText(getContext(), "שם מלא ארוך מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        
+
+        if (fullname.length() < 4){
+            Toast.makeText(getContext(), "שם מלא קצר מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // בדיקה של פורמט האיימיל
+        final String email_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$";
+        Pattern pattern = Pattern.compile(email_REGEX, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        if(!matcher.matches()){
+            Toast.makeText(getContext(), "אימייל לא בפורמט הנכון", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (email.length() > 30){
+            Toast.makeText(getContext(), "אימייל ארוך מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        
+
+        if(profilePicLocalUri == null) {
+            Toast.makeText(getContext(), "העלה תמונת פרופיל", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 }

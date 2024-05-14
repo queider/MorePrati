@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.example.moreprati.R;
 import com.example.moreprati.adapters.TeacherAdapter;
-import com.example.moreprati.fragments.AboutFragment;
 import com.example.moreprati.fragments.RecentChatsFragment;
 import com.example.moreprati.fragments.SearchFragment;
 import com.example.moreprati.objects.Student;
@@ -75,26 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     .commit();
         }
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.action_home) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new SearchFragment())
-                        .commit();
-                return true;
-            } else if (item.getItemId() == R.id.action_chat) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new RecentChatsFragment())
-                        .commit();
-                return true;
-            }else if (item.getItemId() == R.id.action_about) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, new AboutFragment())
-                        .commit();
-                return true;
-            }
-            return false;
-        });
+
 
     }
 

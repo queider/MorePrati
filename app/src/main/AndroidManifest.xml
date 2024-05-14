@@ -43,7 +43,8 @@
 
         <activity
             android:name=".activities.RegistrationActivity"
-            android:exported="false" />
+            android:exported="false"
+            />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"

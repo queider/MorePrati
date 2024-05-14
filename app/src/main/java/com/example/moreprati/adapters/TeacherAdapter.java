@@ -15,8 +15,7 @@ import com.example.moreprati.R;
 import com.example.moreprati.objects.Teacher;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.squareup.picasso.Picasso; // Assuming you use Picasso for image loading
-
+import com.squareup.picasso.Picasso;
 
 public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdapter.ViewHolder> {
 
@@ -34,19 +33,17 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
     }
 
 
-    @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull Teacher model) {
-        Log.d("TeacherAdapter", "Binding data for position: " + position);
-        holder.bind(model);
+        if (position != RecyclerView.NO_POSITION) {
+            holder.bind(model);
 
-        // Set a click listener for the item
-        holder.itemView.setOnClickListener(v -> {
-            // Call the onItemClick method of the listener and pass the clicked teacher
-            listener.onItemClick(model);
-        });
+            // Set a click listener for the item
+            holder.itemView.setOnClickListener(v -> {
+                // Call the onItemClick method of the listener and pass the clicked teacher
+                listener.onItemClick(model);
+            });
+        }
     }
-
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -95,8 +92,8 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
             }
             subjectsTextView.setText(subjectsStringBuilder.toString());
 
-            Log.d("TAG", "bind: "+ teacher.getImage());
-            Picasso.get().load(teacher.getImage()).placeholder(R.drawable.default_profile_pic).into(profileImageView);
+            Log.d("TAG", "bind: "+ teacher.getImageUrl());
+            Picasso.get().load(teacher.getImageUrl()).placeholder(R.drawable.default_profile_pic).into(profileImageView);
 
 
         }

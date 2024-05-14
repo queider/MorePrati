@@ -35,5 +35,23 @@
         <item>תל אביב</item>
 
     </string-array>
+    <string-array name="subjects">
+    <item>אנגלית</item>
+    <item>ביולוגיה</item>
+    <item>ביוכימיה</item>
+    <item>כימיה</item>
+    <item>כלכלה</item>
+    <item>מדעי-המחשב</item>
+    <item>מוזיקה</item>
+    <item>מתמטיקה</item>
+    <item>עברית</item>
+    <item>ערבית</item>
+    <item>פיזיקה</item>
+    <item>ספרות</item>
+    <item>רפואה</item>
+    <item>תנך</item>
+    <item>הנדסת-בניין</item>
+    </string-array>
+
 </resources>
     

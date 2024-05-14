@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.TeacherEditFragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.CardView.Elevated"
+            app:cardCornerRadius="50dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="10dp"
+
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp">
+
+
+                <ImageView
+                    android:alpha="0.5"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/baseline_hide_image_24"
+
+                    />
+
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profilePic"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:scaleType="centerCrop"
+                    />
+
+
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp">
+
+                    <!-- Your existing ImageView and ShapeableImageView -->
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/cameraButton"
+                        style="?attr/materialIconButtonFilledStyle"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        app:icon="@drawable/baseline_camera_alt_24"
+                        app:iconSize="30dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="10dp"/>
+
+                    <RatingBar
+                        android:id="@+id/displayedRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="41dp"
+                        android:scaleX="0.5"
+                        android:scaleY="0.5"
+                        android:isIndicator="true"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginBottom="18dp"/>
+
+                    <TextView
+                        android:id="@+id/howManyRated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="(234)"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginBottom="5dp"
+                        android:fontFamily="@font/heebo_variablefont_wght"
+
+
+                        />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+            </RelativeLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+    <TextView
+        android:gravity="center"
+        android:id="@+id/fullname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="שם מלא"
+        android:textSize="35sp"
+        android:layout_marginTop="5dp"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:fontFamily="@font/heebo_variablefont_wght"
+
+        />
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="asdasd@asdasd.com"
+        android:gravity="center"
+        android:fontFamily="@font/heebo_variablefont_wght"
+
+        />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginHorizontal="30dp"
+
+            android:layout_marginTop="5dp"
+            app:startIconDrawable="@drawable/baseline_location_city_24"
+
+
+            >
+
+            <AutoCompleteTextView
+
+                android:id="@+id/cityMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:completionThreshold="1"
+                android:hint="עיר מגורים"
+                android:fontFamily="@font/heebo_variablefont_wght"
+
+
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="30dp"
+            app:startIconDrawable="@drawable/baseline_square_foot_24"
+            >
+
+            <MultiAutoCompleteTextView
+                android:id="@+id/subjects"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="מקצועות לימוד"
+                android:completionThreshold="1"
+                android:inputType="textMultiLine"
+                android:fontFamily="@font/heebo_variablefont_wght"
+
+
+                />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="30dp"
+            app:startIconDrawable="@drawable/baseline_monitor_24"
+            >
+
+
+            <AutoCompleteTextView
+                android:id="@+id/wayOfLearning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="אופן לימוד"
+                android:completionThreshold="1"
+                android:inputType="textMultiLine"
+                android:fontFamily="@font/heebo_variablefont_wght"
+
+                />
+
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="?attr/textInputFilledStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="מחיר לשעה"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="30dp"
+            app:startIconDrawable="@drawable/baseline_payments_24"
+            android:id="@+id/pricePerHour"
+
+
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/heebo_variablefont_wght"
+
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="?attr/textInputFilledStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:lines="5"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="30dp"
+            android:hint="תיאור"
+            app:startIconDrawable="@drawable/baseline_notes_24"
+            android:id="@+id/description"
+
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Other views or layout elements -->
+
+            <Button
+                android:layout_marginHorizontal="30dp"
+                android:id="@+id/updateButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="עדכן פרופיל"
+                android:fontFamily="@font/heebo_variablefont_wght"
+
+                android:layout_alignParentEnd="true" /> <!-- Align to the end (right side) of the parent RelativeLayout -->
+
+        </RelativeLayout>
+
+
+</LinearLayout>
+</ScrollView>

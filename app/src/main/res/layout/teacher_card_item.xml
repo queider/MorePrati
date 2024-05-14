@@ -6,7 +6,7 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="10dp"
+    android:layout_marginTop="10dp"
     >
 
 
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="פסנטר · מתמטיקה · גיטרה"
+            android:text="נושא · נושא · נושא"
             android:gravity="center"
             android:paddingHorizontal="10dp"
             android:fontFamily="@font/heebo_variablefont_wght"
@@ -71,76 +71,67 @@
 
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        >
-        <TextView
-            android:gravity="center"
-            android:id="@+id/wayOfLearning"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:layout_weight="1"
-            android:text="מרוחק ופרונטלי"
-            android:paddingHorizontal="10dp"
-            android:fontFamily="@font/heebo_variablefont_wght"
+            <TextView
+                android:id="@+id/wayOfLearning"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:text="דרך לימוד"
+                android:fontFamily="@font/heebo_variablefont_wght"
+                android:gravity="center"/>
 
-            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:text="•"
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text="•"
-            android:paddingHorizontal="10dp"
-            />
+                android:layout_gravity="center"/>
 
-        <TextView
-            android:gravity="center"
+            <TextView
+                android:id="@+id/pricePerHour"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:text="מחיר ₪ לשעה"
 
-            android:id="@+id/pricePerHour"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text="90 ₪ לשעה"
-            android:layout_weight="1"
+                android:fontFamily="@font/heebo_variablefont_wght"
+                android:gravity="center"/>
 
-            android:paddingHorizontal="10dp"
-            android:fontFamily="@font/heebo_variablefont_wght"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:text="•"
 
-            />
+                android:layout_gravity="center"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text="•"
-            android:paddingHorizontal="10dp"
-            />
-        <TextView
-            android:layout_weight="1"
-            android:gravity="center"
-            android:id="@+id/city"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:text="פתח תקווה"
-            android:paddingHorizontal="10dp"
-            android:fontFamily="@font/heebo_variablefont_wght"
+            <TextView
+                android:id="@+id/city"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:text="עיר"
 
-            />
+                android:fontFamily="@font/heebo_variablefont_wght"
+                android:gravity="center"/>
 
+        </LinearLayout>
 
-    </LinearLayout>
 
     </LinearLayout>
 </LinearLayout>

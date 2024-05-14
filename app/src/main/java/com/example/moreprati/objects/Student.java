@@ -3,23 +3,25 @@ package com.example.moreprati.objects;
 public class Student {
 
     private String fullname;
-    private String mail;
+    private String email;
     private String city;
     private String uid;
-    private String image;
+    private String imageUrl;
 
     private String fcmToken;
+
 
     public Student() { // Default constructor required for DataSnapshot.getValue(User.class)
 
     }
-    public Student (String fullname, String mail, String city, String uid, String fcmToken, String image) {
+    public Student (String fullname, String email, String city, String uid, String fcmToken, String imageUrl) {
         this.city = city;
         this.fullname = fullname;
-        this.mail = mail;
+        this.email = email;
         this.uid = uid;
-        this.image = image;
+        this.imageUrl = imageUrl;
         this.fcmToken = fcmToken;
+
     }
 
     public String getFullname() {
@@ -30,12 +32,12 @@ public class Student {
         this.fullname = fullname;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getCity() {
@@ -63,11 +65,12 @@ public class Student {
         this.fcmToken = fcmToken;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
+
 }

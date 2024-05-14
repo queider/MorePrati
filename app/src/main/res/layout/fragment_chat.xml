@@ -92,8 +92,7 @@
     <RelativeLayout
 
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
->
+    android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -132,6 +131,8 @@
             app:boxCornerRadiusBottomEnd="30dp"
             app:boxCornerRadiusTopEnd="30dp"
             app:boxCornerRadiusTopStart="30dp"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             >
 
             <com.google.android.material.textfield.TextInputEditText

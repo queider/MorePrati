@@ -1,6 +1,7 @@
 package com.example.moreprati.fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,15 +22,20 @@ import android.widget.Button;
 
 import com.example.moreprati.R;
 import com.example.moreprati.activities.RegistrationActivity;
+import com.example.moreprati.objects.Student;
 import com.example.moreprati.objects.Teacher;
 import com.example.moreprati.adapters.TeacherAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 
@@ -38,6 +44,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SearchFragment extends Fragment {
 
@@ -47,7 +54,7 @@ public class SearchFragment extends Fragment {
 
 
     String[] cities;
-    String[] subjects = {"מתמטיקה", "עברית", "גיטרה", "אנגלית" , "פסנתר"};
+    String[] subjects;
 
     AutoCompleteTextView autoSubjectsMenu;
     AutoCompleteTextView autoCityMenu;
@@ -77,7 +84,7 @@ public class SearchFragment extends Fragment {
         //loads profile pic image
 
         SharedPreferences CurrentUserSP = requireContext().getSharedPreferences("CurrentUser", requireContext().MODE_PRIVATE);
-        String profilePicUri =  CurrentUserSP.getString("image", ""); // Returns an empty string if "image" is not found
+        String profilePicUri =  CurrentUserSP.getString("imageUrl", ""); // Returns an empty string if "image" is not found
         ShapeableImageView profilePicImageView = view.findViewById(R.id.profilePic);
         if(!profilePicUri.isEmpty()){
             Picasso.get()
@@ -93,6 +100,7 @@ public class SearchFragment extends Fragment {
 
         //search menu
         cities = getResources().getStringArray(R.array.cites);
+        subjects = getResources().getStringArray(R.array.subjects);
 
         autoSubjectsMenu = view.findViewById(R.id.autoMenuSubjects);
         autoCityMenu = view.findViewById(R.id.autoCityMenu);
@@ -117,12 +125,42 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        // Set OnClickListener
+        profilePicImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+                boolean isTeacher = sharedPreferences.getBoolean("isTeacher", true);
+                if(isTeacher){
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new TeacherEditFragment())
+                            .addToBackStack(null) // Add to back stack for back navigation
+                            .commit();
+                } else {
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new StudentEditFragment())
+                            .addToBackStack(null) // Add to back stack for back navigation
+                            .commit();
+                }
+
+
+            }
+        });
+
+
         // Set up the search and clear buttons
         Button searchButton = view.findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setUpRecyclerView(); // <---- here is the problem
+                if (teacherAdapter != null) {
+                    teacherAdapter.stopListening();
+                    teacherAdapter = null;
+                }
+                setUpRecyclerView();
             }
         });
 
@@ -141,7 +179,7 @@ public class SearchFragment extends Fragment {
 
         Button logoutButton = view.findViewById(R.id.logout);
 
-        // Set click listener for the logout button
+
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +190,26 @@ public class SearchFragment extends Fragment {
                 builder.setPositiveButton("צא", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
+                        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+                        String currentUserId = sharedPreferences.getString("uid", "");
+                        boolean isTeacher = sharedPreferences.getBoolean("isTeacher", true);
+                        DatabaseReference userReference;
+                        if (!isTeacher) {
+                             userReference = FirebaseDatabase.getInstance().getReference().child("Students").child(currentUserId).child("fcmToken");
+                        } else {
+                             userReference = FirebaseDatabase.getInstance().getReference().child("Teachers").child(currentUserId).child("fcmToken");;
+                        }
+
+                        userReference.setValue("")
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("YAZAN", "[+] Logging out: FCM token cleared successfully");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while setting the value
+                                    Log.d("YAZAN", "[-] Logging out: FCM token clearance failed");
+                                });
+
                         File sharedPreferencesDir = new File(requireContext().getApplicationInfo().dataDir + "/shared_prefs");
 
                         // Get a list of all files in the directory
@@ -180,6 +238,24 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        BottomNavigationView bottomNavigationView = view.findViewById(R.id.bottom_navigation);
+
+        // Set the item selection listener
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment fragment = null;
+            if (item.getItemId() == R.id.action_home) {
+                fragment = new SearchFragment();
+            } else if (item.getItemId() == R.id.action_chat) {
+                fragment = new RecentChatsFragment();
+            }
+            if (fragment != null) {
+                requireActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .commit();
+                return true;
+            }
+            return false;
+        });
         return view;
     }
 
@@ -232,7 +308,7 @@ public class SearchFragment extends Fragment {
             args.putString("wayOfLearning", teacher.getWayOfLearning());
             args.putInt("pricePerHour", teacher.getPricePerHour());
             args.putString("description", teacher.getDescription());
-            args.putString("imageUrl", teacher.getImage());
+            args.putString("imageUrl", teacher.getImageUrl());
             args.putFloat("rating", teacher.getRating());
             args.putString("fcmToken", teacher.getFcmToken());
 

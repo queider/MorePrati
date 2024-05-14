@@ -79,6 +79,8 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/heebo_variablefont_wght"
+
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -89,7 +91,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         style="?attr/textInputFilledStyle"
-        android:id="@+id/mail"
+        android:id="@+id/email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
@@ -104,6 +106,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textWebEmailAddress"
+            android:fontFamily="@font/heebo_variablefont_wght"
             />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -125,6 +129,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
 
             />
 
@@ -149,8 +155,8 @@
             android:completionThreshold="1"
             android:inputType="none"
             android:hint="עיר מגורים"
-            android:editable="false"
-            android:focusable="false"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -170,8 +176,8 @@
             android:hint="מקצועות לימוד"
             android:completionThreshold="1"
             android:inputType="textMultiLine"
-            android:editable="false"
-            android:focusable="false"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             />
 
 
@@ -193,8 +199,8 @@
             android:hint="אופן לימוד"
             android:completionThreshold="1"
             android:inputType="textMultiLine"
-            android:editable="false"
-            android:focusable="false"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             />
 
 
@@ -217,6 +223,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -247,6 +255,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <!-- Other views or layout elements -->
 
         <Button
@@ -255,6 +264,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="הירשם"
+            android:fontFamily="@font/heebo_variablefont_wght"
+
             android:layout_alignParentEnd="true" /> <!-- Align to the end (right side) of the parent RelativeLayout -->
 
     </RelativeLayout>

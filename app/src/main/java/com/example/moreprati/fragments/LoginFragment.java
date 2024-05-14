@@ -36,7 +36,7 @@ public class LoginFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private String password;
-    private String mail;
+    private String email;
 
     private String fcmToken;
     private DatabaseReference teachersRef;
@@ -52,10 +52,10 @@ public class LoginFragment extends Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TextInputLayout mailLayout = view.findViewById(R.id.mail);
-                EditText mailEditText = mailLayout.getEditText();
-                if (mailEditText != null) {
-                    mail = mailEditText.getText().toString();
+                TextInputLayout emailLayout = view.findViewById(R.id.email);
+                EditText emailEditText = emailLayout.getEditText();
+                if (emailEditText != null) {
+                    email = emailEditText.getText().toString();
                 }
 
                 TextInputLayout passwordLayout = view.findViewById(R.id.password);
@@ -64,7 +64,7 @@ public class LoginFragment extends Fragment {
                     password = passwordEditText.getText().toString();
                 }
 
-                signInUser(mail, password);
+                signInUser(email, password);
             }
         });
 
@@ -72,8 +72,8 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    private void signInUser(String mail, String password) {
-        mAuth.signInWithEmailAndPassword(mail, password)
+    private void signInUser(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -162,7 +162,7 @@ public class LoginFragment extends Fragment {
         editor.putBoolean("isTeacher", true);
         editor.putString("fullname", teacher.getFullname());
         editor.putString("uid", teacher.getUid());
-        editor.putString("image", teacher.getImage());
+        editor.putString("imageUrl", teacher.getImageUrl());
         editor.putString("fcmToken", fcmToken);
 
         editor.apply();
@@ -177,7 +177,7 @@ public class LoginFragment extends Fragment {
         editor.putBoolean("isTeacher", false);
         editor.putString("fullname", student.getFullname());
         editor.putString("uid", student.getUid());
-        editor.putString("image", student.getImage());
+        editor.putString("imageUrl", student.getImageUrl());
         editor.putString("fcmToken", fcmToken);
         editor.apply();
 

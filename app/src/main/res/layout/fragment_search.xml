@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp"
         android:padding="5dp"
         >
 
@@ -41,12 +40,14 @@
 
 
     </LinearLayout>
+
+    <!-- Your RecyclerView -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
 
-        android:layout_marginHorizontal="10dp"
 
         >
 
@@ -55,51 +56,55 @@
 
         <!-- Your subject dropdown -->
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:hint="@string/select_subject"
-            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
-            android:layout_marginRight="10dp">
+            android:layout_marginEnd="5dp"
+            >
 
             <AutoCompleteTextView
                 android:id="@+id/autoMenuSubjects"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:fontFamily="@font/heebo_variablefont_wght"
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Your city dropdown -->
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/select_city"
-            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu">
+            android:hint="@string/select_city">
 
             <AutoCompleteTextView
                 android:id="@+id/autoCityMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:fontFamily="@font/heebo_variablefont_wght"
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Your clear button -->
 
     </LinearLayout>
 
-
-    <!-- Your RecyclerView -->
-
-        <RelativeLayout
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="10dp">
+>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_marginHorizontal="10dp"
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom_navigation"
+            />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/clear_button"
@@ -109,7 +114,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 app:iconSize="30dp"
-
+                android:layout_marginHorizontal="10dp"
                 app:icon="@drawable/baseline_backspace_24" />
 
             <com.google.android.material.button.MaterialButton
@@ -119,11 +124,24 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginStart="60dp"
+                android:layout_marginStart="70dp"
+
                 app:iconSize="30dp"
 
 
                 app:icon="@drawable/baseline_person_search_24" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottom_navigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                app:menu="@menu/bottom_navigation_menu"
+                app:itemBackground="@android:color/transparent"
+
+
+                />
         </RelativeLayout>
+
 
 </LinearLayout>
