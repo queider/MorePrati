@@ -4,14 +4,14 @@ import java.util.Map;
 
 public class Teacher {
     private String fullname;
-    private String email; // this is an email
+    private String email;
     private String city;
     private String uid;
 
     private Map<String, Boolean> subjects;
     private Map<String, Boolean> citySubjects;
 
-    private String wayOfLearning; // ether online, face to face or both
+    private String wayOfLearning;
 
     private int pricePerHour;
 

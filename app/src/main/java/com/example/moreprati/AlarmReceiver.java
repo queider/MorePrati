@@ -57,7 +57,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.baseline_school_24)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("תזכורת לשיעור")
                 .setContentText("יש לך שיעור בעוד 5 דקות עם " + fullname)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);

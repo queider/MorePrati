@@ -1,16 +1,10 @@
 package com.example.moreprati.fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,50 +14,40 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.moreprati.R;
 import com.example.moreprati.activities.RegistrationActivity;
-import com.example.moreprati.objects.Student;
-import com.example.moreprati.objects.Teacher;
 import com.example.moreprati.adapters.TeacherAdapter;
+import com.example.moreprati.objects.Teacher;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 public class SearchFragment extends Fragment {
 
+    String[] cities;
+    String[] subjects;
+    AutoCompleteTextView autoSubjectsMenu;
+    AutoCompleteTextView autoCityMenu;
+    ArrayAdapter<String> adapterSubjects;
+    ArrayAdapter<String> adapterCity;
+    String searchSubject = null;
+    String searchCity = null;
     private DatabaseReference teachersRef;
     private TeacherAdapter teacherAdapter;
     private RecyclerView recyclerView;
-
-
-    String[] cities;
-    String[] subjects;
-
-    AutoCompleteTextView autoSubjectsMenu;
-    AutoCompleteTextView autoCityMenu;
-
-    ArrayAdapter<String> adapterSubjects;
-    ArrayAdapter<String> adapterCity;
-
-    String searchSubject = null;
-    String searchCity = null;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -83,10 +67,11 @@ public class SearchFragment extends Fragment {
 
         //loads profile pic image
 
-        SharedPreferences CurrentUserSP = requireContext().getSharedPreferences("CurrentUser", requireContext().MODE_PRIVATE);
-        String profilePicUri =  CurrentUserSP.getString("imageUrl", ""); // Returns an empty string if "image" is not found
+        requireContext();
+        SharedPreferences CurrentUserSP = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+        String profilePicUri = CurrentUserSP.getString("imageUrl", ""); // Returns an empty string if "image" is not found
         ShapeableImageView profilePicImageView = view.findViewById(R.id.profilePic);
-        if(!profilePicUri.isEmpty()){
+        if (!profilePicUri.isEmpty()) {
             Picasso.get()
                     .load(profilePicUri)
                     .placeholder(R.drawable.default_profile_pic) // Placeholder image while loading
@@ -131,7 +116,7 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
                 boolean isTeacher = sharedPreferences.getBoolean("isTeacher", true);
-                if(isTeacher){
+                if (isTeacher) {
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, new TeacherEditFragment())
@@ -180,7 +165,6 @@ public class SearchFragment extends Fragment {
         Button logoutButton = view.findViewById(R.id.logout);
 
 
-
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,9 +180,9 @@ public class SearchFragment extends Fragment {
                         boolean isTeacher = sharedPreferences.getBoolean("isTeacher", true);
                         DatabaseReference userReference;
                         if (!isTeacher) {
-                             userReference = FirebaseDatabase.getInstance().getReference().child("Students").child(currentUserId).child("fcmToken");
+                            userReference = FirebaseDatabase.getInstance().getReference().child("Students").child(currentUserId).child("fcmToken");
                         } else {
-                             userReference = FirebaseDatabase.getInstance().getReference().child("Teachers").child(currentUserId).child("fcmToken");;
+                            userReference = FirebaseDatabase.getInstance().getReference().child("Teachers").child(currentUserId).child("fcmToken");
                         }
 
                         userReference.setValue("")
@@ -279,7 +263,7 @@ public class SearchFragment extends Fragment {
 
         if (searchSubject != null && searchCity != null) {
             query = query.orderByChild("citySubjects/" + searchCity + "_" + searchSubject).equalTo(true);
-            Log.d("Yazan", "[*] 3  Search: searching for "+ searchCity + "_" + searchSubject);
+            Log.d("Yazan", "[*] 3  Search: searching for " + searchCity + "_" + searchSubject);
         }
 
         if (searchSubject == null && searchCity == null) {
@@ -311,6 +295,8 @@ public class SearchFragment extends Fragment {
             args.putString("imageUrl", teacher.getImageUrl());
             args.putFloat("rating", teacher.getRating());
             args.putString("fcmToken", teacher.getFcmToken());
+            args.putInt("howManyRated", teacher.getHowManyRated());
+
 
             teacherInfoFragment.setArguments(args);
 
@@ -322,24 +308,6 @@ public class SearchFragment extends Fragment {
         });
 
         recyclerView.setAdapter(teacherAdapter);
-
         teacherAdapter.startListening();
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (teacherAdapter != null) {
-            teacherAdapter.startListening();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (teacherAdapter != null) {
-            teacherAdapter.stopListening();
-        }
-    }
-
 }

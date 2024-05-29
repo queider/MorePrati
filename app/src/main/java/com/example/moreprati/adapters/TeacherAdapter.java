@@ -44,6 +44,7 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
             });
         }
     }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -59,6 +60,8 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
         public TextView pricePerHourTextView;
         public TextView cityTextView;
         public TextView subjectsTextView;
+        public TextView howManyRated;
+
         public ImageView profileImageView;
 
         public ViewHolder(@NonNull View itemView) {
@@ -70,6 +73,7 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
             cityTextView = itemView.findViewById(R.id.city);
             subjectsTextView = itemView.findViewById(R.id.subjects);
             profileImageView = itemView.findViewById(R.id.profilePic);
+            howManyRated = itemView.findViewById(R.id.howManyRated);
         }
 
         public void bind(Teacher teacher) {
@@ -79,6 +83,7 @@ public class TeacherAdapter extends FirebaseRecyclerAdapter<Teacher, TeacherAdap
             wayOfLearningTextView.setText(teacher.getWayOfLearning());
             pricePerHourTextView.setText(String.valueOf(teacher.getPricePerHour()) + " ₪ לשעה");
             cityTextView.setText(teacher.getCity());
+            howManyRated.setText("(" +String.valueOf( teacher.getHowManyRated()) + ")");
 
             // Extract subjects from the map and join them into a string
             StringBuilder subjectsStringBuilder = new StringBuilder();

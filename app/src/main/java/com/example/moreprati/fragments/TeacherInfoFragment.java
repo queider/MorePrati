@@ -41,6 +41,8 @@ public class TeacherInfoFragment extends Fragment {
     private Map<String, Boolean> subjects;
     private String wayOfLearning;
     private int pricePerHour;
+    private int howManyRated;
+
     private String description;
     private String imageUrl;
     private float rating;
@@ -63,6 +65,7 @@ public class TeacherInfoFragment extends Fragment {
             imageUrl = args.getString("imageUrl");
             rating = args.getFloat("rating", 0);
             fcmToken = args.getString("fcmToken");
+            howManyRated = args.getInt("howManyRated", 0);
         }
 
         RatingBar displayedRating = view.findViewById(R.id.displayedRating);
@@ -74,6 +77,8 @@ public class TeacherInfoFragment extends Fragment {
         TextView subjectsTextView = view.findViewById(R.id.subjects);
         TextView descriptionEditText = view.findViewById(R.id.description);
         RatingBar ratingBar = view.findViewById(R.id.ratingBar);
+        TextView howManyRatedTextView = view.findViewById(R.id.howManyRated);
+
 
         // Load image using Picasso
         Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(profileImageView);
@@ -84,6 +89,7 @@ public class TeacherInfoFragment extends Fragment {
         wayOfLearningTextView.setText(wayOfLearning);
         pricePerHourTextView.setText(String.valueOf(pricePerHour));
         cityTextView.setText(city);
+        howManyRatedTextView.setText("(" + String.valueOf(howManyRated) + ")");
 
         // Extract subjects from the map and join them into a string
         StringBuilder subjectsStringBuilder = new StringBuilder();
@@ -169,6 +175,8 @@ public class TeacherInfoFragment extends Fragment {
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Log.d("FirebaseUpdate", "Values updated successfully!");
+                                            Toast.makeText(requireContext(), "דורג!", Toast.LENGTH_SHORT).show();
+
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {

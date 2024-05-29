@@ -1,16 +1,27 @@
-users
-yazan
-yazanyazan
+Students:
+einavshakiri@gmail.com
+einav123
 
-g
-gggggggg
+shalevbiton@gmail.com
+bitonsh123
 
+Teachers:
+matancohen@gmail.com
+matan123
 
-Calendar calendar
+yazanqueider@gmail.com
+yazoon123
 
-הגדרת תאריך ושעה ספציפיים- 1/9/2023:
-calendar.set(2023, Calendar.SEPTEMBER, 1);
+nadavdov@gmail.com
+nadav123
 
-yazyazyaz
+shalommalci@gmail.com
+shalom123
 
-I want an alarm to be set by the user. in this ChatFragment, the user will have a pop up that allows him to choose a date and hour for the alarm and "set alarm" button the sets the alarm to the givin date. the pop up will also show if there is an allreay exiting alarm 
+hadasor@gmail.com
+hadas123
+
+ב
+פ
+מ
+פ

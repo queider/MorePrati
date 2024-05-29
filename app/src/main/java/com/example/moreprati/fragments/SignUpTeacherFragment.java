@@ -4,7 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.annotation.SuppressLint;
@@ -24,7 +23,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MultiAutoCompleteTextView;
-import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -354,13 +352,13 @@ public class SignUpTeacherFragment extends Fragment {
 
         if(description.length() > 400)
         {
-            Toast.makeText(getContext(), "אודות המורה קצר מידי", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "אודות המורה ארוך מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(description.length() < 20)
         {
-            Toast.makeText(getContext(), "אודות ארוך מידי", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "אודות קצר מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
 

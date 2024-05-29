@@ -120,7 +120,7 @@ public class ChatFragment extends Fragment {
     private String chatToken;
     private ImageView imageView;
 
-    private TextView textView;
+    private TextView fullnameTextView;
 
 
 
@@ -155,7 +155,7 @@ public class ChatFragment extends Fragment {
 
         //ui setup
         imageView = view.findViewById(R.id.image);
-        textView = view.findViewById(R.id.fullname);
+        fullnameTextView = view.findViewById(R.id.fullname);
         //firebase:
         firebaseAuth = FirebaseAuth.getInstance();
         chatsReference = FirebaseDatabase.getInstance().getReference().child("Chats");
@@ -194,7 +194,7 @@ public class ChatFragment extends Fragment {
             chatToken = PressedRecentChat.getFcmToken();
 
         }
-        textView.setText(fullname);
+        fullnameTextView.setText(fullname);
         Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(imageView);
 
 
@@ -286,7 +286,6 @@ public class ChatFragment extends Fragment {
                 sendButton.setEnabled(!editable.toString().trim().isEmpty());
             }
         });
-
         return view;
     }
 

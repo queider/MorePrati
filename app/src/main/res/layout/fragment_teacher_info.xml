@@ -27,6 +27,7 @@
 
             >
         <ImageView
+            android:layout_gravity="center"
             android:id="@+id/profilePic"
             android:layout_width="match_parent"
             android:layout_height="250dp"
@@ -73,10 +74,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="41dp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="4dp"
                 android:scaleX="0.5"
                 android:scaleY="0.5"
                 android:isIndicator="true"
+
+                />
+            <TextView
+                android:id="@+id/howManyRated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/heebo_variablefont_wght"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:layout_marginBottom="5dp"
+                android:text="(כמה דירגו)"
+                android:textSize="18sp"
 
                 />
 
