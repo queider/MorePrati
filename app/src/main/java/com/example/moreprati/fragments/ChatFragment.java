@@ -1,27 +1,13 @@
 package com.example.moreprati.fragments;
 
-import static android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM;
-
-import static androidx.core.content.ContextCompat.registerReceiver;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 // ChatActivity.java
@@ -29,12 +15,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,20 +24,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.moreprati.AlarmReceiver;
-import com.example.moreprati.activities.MainActivity;
 import com.example.moreprati.objects.Alarm;
 import com.example.moreprati.objects.Message;
 import com.example.moreprati.R;
 import com.example.moreprati.adapters.MessageAdapter;
-import com.example.moreprati.objects.ObjectSerialization;
+import com.example.moreprati.ObjectSerialization;
 import com.example.moreprati.objects.RecentChat;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -66,11 +44,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -90,13 +66,9 @@ import okhttp3.Response;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 
 public class ChatFragment extends Fragment {
@@ -299,7 +271,7 @@ public class ChatFragment extends Fragment {
     private void loadMessages() {
 
         chatsReference.child(chatName).child("Messages")
-                .addChildEventListener(new ChildEventListener() {
+                    .addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                         Message message = dataSnapshot.getValue(Message.class);

@@ -3,8 +3,6 @@ import android.content.Context;
 import android.content.res.Resources;
 
 
-import android.content.res.Resources;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,8 +37,6 @@ public class SubjectMapper {
         for (String subject : allSubjects) {
             // Check if the subject is in the input array
             boolean isInArray = containsIgnoreCase(subjectArray, subject);
-
-            // Add the subject and its status to the map
             subjectMap.put(subject, isInArray);
         }
 

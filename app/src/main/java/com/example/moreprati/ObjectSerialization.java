@@ -1,8 +1,10 @@
-package com.example.moreprati.objects;
+package com.example.moreprati;
 
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.example.moreprati.objects.Alarm;
 import com.google.gson.Gson;
 
 public class ObjectSerialization {

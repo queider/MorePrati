@@ -7,20 +7,14 @@ public class Teacher {
     private String email;
     private String city;
     private String uid;
-
     private Map<String, Boolean> subjects;
     private Map<String, Boolean> citySubjects;
-
     private String wayOfLearning;
-
     private int pricePerHour;
-
     private String description;
     private String imageUrl;
-
     private float rating;
     private int howManyRated;
-
     private String fcmToken;
 
 

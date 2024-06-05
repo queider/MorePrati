@@ -28,7 +28,7 @@ public class Message {
         return sender;
     }
 
-    public void setSedner(String sedner) {
+    public void setSender(String sender) {
         this.sender = sender;
     }
 

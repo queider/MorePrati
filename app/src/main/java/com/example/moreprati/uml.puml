@@ -1,0 +1,434 @@
+@startuml
+package com.example.moreprati.activities{
+class MainActivity {
+    +onCreate(savedInstanceState: Bundle): void
+}
+
+class RegistrationActivity {
+    +onCreate(savedInstanceState: Bundle): void
+    -launchTeacherOrStudentFragment(): void
+}
+}
+package com.example.moreprati.objects {
+
+class Alarm {
+    - calendar: Calendar
+    - chatUserId: String
+    - fullname: String
+    - requestCode: int
+    + Alarm(calendar: Calendar, chatUserId: String, fullname: String)
+    + getCalendar(): Calendar
+    + setCalendar(calendar: Calendar): void
+    + getChatUserId(): String
+    + setChatUserId(chatUserId: String): void
+    + getFullname(): String
+    + setFullname(fullname: String): void
+    + getRequestCode(): int
+    + setRequestCode(requestCode: int): void
+    + setAlarm(context: Context, alarm: Alarm): boolean
+}
+class Message {
+    - String messageText
+    - String sender
+    + Message()
+    + Message(String messageText, String sender)
+    + String getMessageText()
+    + void setMessageText(String messageText)
+    + String getSender()
+    + void setSender(String sender)
+}
+class ObjectSerialization {
+    - static final String PREF_NAME = "Alarms"
+    - SharedPreferences sharedPreferences
+    - Gson gson
+    - String AlarmChatUserId
+    + ObjectSerialization(Context context, String AlarmChatUserId)
+    + void saveAlarm(Alarm alarm)
+    + Alarm getAlarm()
+    + void removeAlarm()
+    + boolean AlarmExist()
+}
+class RecentChat implements Serializable {
+     - String fullname
+     - String imageUrl
+     - String chatUserId
+     - String chatName
+     - String fcmToken
+     - String lastMessage
+     + RecentChat(String fcmToken)
+     + RecentChat(String fullname, String imageUrl, String chatUserId, String chatName, String fcmToken, String lastMessage)
+     + String getFullname()
+     + void setFullname(String fullname)
+     + String getImageUrl()
+     + void setImageUrl(String imageUrl)
+     + String getChatUserId()
+     + void setChatUserId(String chatUserId)
+     + String getFcmToken()
+     + void setFcmToken(String fcmToken)
+     + String getChatName()
+     + void setChatName(String chatName)
+     + String getLastMessage()
+     + void setLastMessage(String lastMessage)
+ }
+class Teacher {
+    - String fullname
+    - String email
+    - String city
+    - String uid
+    - Map<String, Boolean> subjects
+    - Map<String, Boolean> citySubjects
+    - String wayOfLearning
+    - int pricePerHour
+    - String description
+    - String imageUrl
+    - float rating
+    - int howManyRated
+    - String fcmToken
+    + Teacher()
+    + Teacher(String fullname, String email, String city, String uid, Map<String, Boolean> subjects, Map<String, Boolean> citySubjects, String wayOfLearning, int pricePerHour, String description, String imageUrl,String fcmToken)
+    + String getFullname()
+    + void setFullname(String fullname)
+    + String getEmail()
+    + void setEmail(String mail)
+    + String getCity()
+    + void setCity(String city)
+    + String getUid()
+    + void setUid(String uid)
+    + Map<String, Boolean> getSubjects()
+    + void setSubjects(Map<String, Boolean> subjects)
+    + Map<String, Boolean> getCitySubjects()
+    + void setCitySubjects(Map<String, Boolean> citySubjects)
+    + String getWayOfLearning()
+    + void setWayOfLearning(String wayOfLearning)
+    + int getPricePerHour()
+    + void setPricePerHour(int pricePerHour)
+    + String getDescription()
+    + void setDescription(String description)
+    + String getImageUrl()
+    + void setImageUrl(String imageUrl)
+    + float getRating()
+    + void setRating(float rating)
+    + String getFcmToken()
+    + void setFcmToken(String fcmToken)
+    + int getHowManyRated()
+    + void setHowManyRated(int howManyRated)
+}
+class Student {
+    - String fullname
+    - String email
+    - String city
+    - String uid
+    - String imageUrl
+    - String fcmToken
+    + Student()
+    + Student(String fullname, String email, String city, String uid, String fcmToken, String imageUrl)
+    + String getFullname()
+    + void setFullname(String fullname)
+    + String getEmail()
+    + void setEmail(String email)
+    + String getCity()
+    + void setCity(String city)
+    + String getUid()
+    + void setUid(String uid)
+    + String getFcmToken()
+    + void setFcmToken(String fcmToken)
+    + String getImageUrl()
+    + void setImageUrl(String imageUrl)
+}
+
+}
+
+package com.example.moreprati.fragments {
+    class LoginFragment {
+        - mAuth: FirebaseAuth
+        - password: String
+        - email: String
+        - fcmToken: String
+        - teachersRef: DatabaseReference
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        - signInUser(email: String, password: String): void
+        - searchTeacherByUid(uid: String): void
+        - searchStudentByUid(uid: String): void
+        - handleFoundTeacher(teacher: Teacher): void
+        - handleFoundStudent(student: Student): void
+        - getFCMToken(): void
+    }
+
+class ChatFragment {
+        - recyclerView: RecyclerView
+        - messageInputLayout: TextInputLayout
+        - messageEditText: EditText
+        - sendButton: Button
+        - firebaseAuth: FirebaseAuth
+        - chatsReference: DatabaseReference
+        - currentUserId: String
+        - chatUserId: String
+        - fullname: String
+        - imageUrl: String
+        - chatToken: String
+        - imageView: ImageView
+        - fullnameTextView: TextView
+        - messagesList: List<Message>
+        - messageAdapter: MessageAdapter
+        - timerButton: Button
+        - selectedDateTimeTextView: TextView
+        - calendar: Calendar
+        - sharedPreferences: SharedPreferences
+        - receiver: BroadcastReceiver
+        - chatName: String
+        - userImageUrl: String
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        + onDestroyView(): void
+        - loadMessages(): void
+        - sendMessage(): void
+        - sendNotification(message: String, imageUrl: String): void
+        - callApi(jsonObject: JSONObject): void
+        - showDateTimePickerDialog(): void
+        - checkNotificationPermissions(): boolean
+    }
+        class RecentChatsFragment {
+            - userRef: DatabaseReference
+            - recyclerView: RecyclerView
+            - adapter: RecentChatsAdapter
+            - currentUserId: String
+            - bottomNavigationView: BottomNavigationView
+            - chatsRef: DatabaseReference
+            - teachersRef: DatabaseReference
+            - studentsRef: DatabaseReference
+            + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+            - getOtherUid(currentUid: String, chatId: String): String
+            - makeRecentChatFromUid(chatUserId: String, chatName: String): void
+            - startChatFragment(recentChat: RecentChat): void
+            - isCurrentActivity(activityClass: Class<?>): boolean
+        }
+    class SearchFragment {
+        - cities: String[]
+        - subjects: String[]
+        - autoSubjectsMenu: AutoCompleteTextView
+        - autoCityMenu: AutoCompleteTextView
+        - adapterSubjects: ArrayAdapter<String>
+        - adapterCity: ArrayAdapter<String>
+        - searchSubject: String
+        - searchCity: String
+        - teachersRef: DatabaseReference
+        - teacherAdapter: TeacherAdapter
+        - recyclerView: RecyclerView
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        - setUpRecyclerView(): void
+    }
+    class SignUpStudentFragment {
+        - mAuth: FirebaseAuth
+        - uid: String
+        - fcmToken: String
+        - fullname: String
+        - email: String
+        - city: String
+        - password: String
+        - profilePic: ImageView
+        - cameraButton: Button
+        - profilePicUri: String
+        - profilePicLocalUri: Uri
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        - registerStudent(): void
+        - linkUserToDatabase(): void
+        - proceedWithLinking(): void
+        - registerStudent(Student): void
+        - uploadProfilePicToStorage(Uri): void
+        - reauthenticateUser(String, String): void
+        + onActivityResult(requestCode: int, resultCode: int, data: Intent): void
+        - validation(): boolean
+    }
+    class SignUpTeacherFragment {
+            - mAuth: FirebaseAuth
+            - profilePic: ImageView
+            - cameraButton: Button
+            - profilePicUri: String
+            - profilePicLocalUri: Uri
+            - fullname: String
+            - email: String
+            - password: String
+            - city: String
+            - subjectsArray: String[]
+            - wayOfLearningString: String
+            - pricePerHour: int
+            - description: String
+            - uid: String
+            - fcmToken: String
+            - subjectMap: Map<String, Boolean>
+            - CitySubjectMap: Map<String, Boolean>
+            + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+            + processString(input: String): String[]
+            + onActivityResult(requestCode: int, resultCode: int, data: Intent): void
+            - registerTeacher(): void
+            - linkUserToDatabase(): void
+            - proceedWithLinking(): void
+            - registerTeacher(Teacher): void
+            - validation(): boolean
+            - uploadProfilePicToStorage(Uri): void
+            - reauthenticateUser(String, String): void
+        }
+    class StudentEditFragment {
+        - cityMenu: AutoCompleteTextView
+        - studentReference: DatabaseReference
+        - currentUserId: String
+        - imageUrl: String
+        - fullname: String
+        - email: String
+        - city: String
+        - imageSetFlag: boolean
+        - profilePicLocalUri: Uri
+        - profilePicUri: String
+        - updateButton: Button
+        - cameraButton: Button
+        - profilePic: ImageView
+        - fullnameEditText: TextView
+        - emailEditText: TextView
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        + onActivityResult(requestCode: int, resultCode: int, data: Intent): void
+        + changeParamatersInView(): void
+        + updateDatabase(): void
+        + uploadProfilePicToStorage(): void
+    }
+    class TeacherEditFragment {
+        - city: String
+        - subjectsMap: Map<String, Boolean>
+        - citySubjectsMap: Map<String, Boolean>
+        - wayOfLearning: String
+        - pricePerHour: int
+        - description: String
+        - imageUrl: String
+        - subjectsString: String
+        - rating: float
+        - howManyRated: int
+        - view: View
+        - descriptionEditText: EditText
+        - pricePerHourEditText: EditText
+        - howManyRatedEditText: TextView
+        - fullnameTextView: TextView
+        - emailTextView: TextView
+        - displayedRating: RatingBar
+        - cityMenu: AutoCompleteTextView
+        - subjectsMenu: MultiAutoCompleteTextView
+        - wayOfLearningMenu: AutoCompleteTextView
+        - updateButton: Button
+        - subjectsArray: String[]
+        - profilePic: ShapeableImageView
+        - currentUserId: String
+        - teacherReference: DatabaseReference
+        - cameraButton: Button
+        - profilePicUri: String
+        - profilePicLocalUri: Uri
+        - imageSetFlag: boolean
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        + onActivityResult(requestCode: int, resultCode: int, data: Intent): void
+        + updateDatabase(): void
+        + uploadProfilePicToStorage(): void
+        + changeParamatersInView(): void
+        + processString(input: String): String[]
+        + validation(): boolean
+    }
+    class TeacherInfoFragment {
+        - fullname: String
+        - city: String
+        - uid: String
+        - subjects: Map<String, Boolean>
+        - wayOfLearning: String
+        - pricePerHour: int
+        - howManyRated: int
+        - description: String
+        - imageUrl: String
+        - rating: float
+        - fcmToken: String
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        - calculateNewRating(currentRating: float, howManyRated: int, userRating: float): float
+    }
+    class TeacherOrStudentFragment {
+        + TeacherOrStudentFragment()
+        + onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle): View
+        - launchSignUpStudentFragment(): void
+        - launchLoginFragment(): void
+        - launchSignUpTeacherFragment(): void
+    }
+}
+package com.example.moreprati {
+
+    class AlarmReceiver {
+        + onReceive(Context context, Intent intent)
+        - showNotification(Context context, String fullname)
+    }
+    class SubjectMapper {
+        + mapSubjects(String[], Context): Map<String, Boolean>
+        + mapCitySubjects(String[], String, Context): Map<String, Boolean>
+        + updateMapWithCity(Map<String, Boolean>, String): Map<String, Boolean>
+        + mapToString(Map<String, Boolean>): String
+        - containsIgnoreCase(String[], String): boolean
+    }
+    class FCMNofiticationService {
+        - TAG: String
+        + onMessageReceived(RemoteMessage)
+    }
+    class BootReceiver {
+        + onReceive(Context, Intent)
+    }
+    class AppSettings {
+    + onCreate()
+
+}
+
+
+}
+
+package com.example.moreprati.adapters {
+
+class TeacherAdapter {
+    - listener: OnItemClickListener
+    + interface OnItemClickListener
+    + onBindViewHolder(ViewHolder, int, Teacher)
+    + onCreateViewHolder(ViewGroup, int): ViewHolder
+}
+
+
+class RecentChatsAdapter {
+    - recentChatList: List<RecentChat>
+    - listener: OnItemClickListener
+    + interface OnItemClickListener
+    + addRecentChat(RecentChat)
+    + onCreateViewHolder(ViewGroup, int): RecentChatsViewHolder
+    + onBindViewHolder(RecentChatsViewHolder, int)
+    + getItemCount(): int
+    + static class RecentChatsViewHolder
+}
+
+
+class RecentChatsViewHolder {
+    - chatUserName: TextView
+    - image: ImageView
+    - lastMessage: TextView
+}
+
+
+
+class MessageAdapter {
+     -messages: List<Message>
+     -currentUserId: String
+     -messageLayout: FrameLayout
+     +MessageAdapter(messages: List<Message>, currentUserId: String)
+     +onCreateViewHolder(parent: ViewGroup, viewType: int): MessageViewHolder
+     +onBindViewHolder(holder: MessageViewHolder, position: int): void
+     +getItemCount(): int
+     class MessageViewHolder {
+         -messageTextView: TextView
+         +MessageViewHolder(itemView: View)
+         +bind(message: Message, currentUserId: String): void
+         +updateGravity(gravity: int): void
+     }
+    }
+
+}
+
+
+
+
+
+
+@enduml
