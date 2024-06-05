@@ -34,6 +34,7 @@ import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,13 +49,11 @@ import java.util.Map;
 
 
 public class StudentEditFragment extends Fragment {
-    private AutoCompleteTextView cityMenu;
     private DatabaseReference studentReference;
     private String currentUserId;
     private String imageUrl;
     private String fullname;
     private String email;
-    private String city;
     private boolean imageSetFlag = false;
     private Uri profilePicLocalUri;
     private String profilePicUri;
@@ -67,19 +66,16 @@ public class StudentEditFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        FirebaseApp.initializeApp(requireContext());
         View view = inflater.inflate(R.layout.fragment_student_edit, container, false);
-        cityMenu = view.findViewById(R.id.cityMenu);
         cameraButton = view.findViewById(R.id.cameraButton);
         updateButton = view.findViewById(R.id.updateButton);
         fullnameEditText = view.findViewById(R.id.fullname);
         emailEditText = view.findViewById(R.id.email);
         profilePic = view.findViewById(R.id.profilePic);
 
-        //auto complete cities menu
-        Resources res = getResources();
-        String[] cities = res.getStringArray(R.array.cites);
-        ArrayAdapter<String> adapterCity = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cities);
-        cityMenu.setAdapter(adapterCity);
+
+        FirebaseApp.initializeApp(requireContext());
 
 
 
@@ -98,7 +94,6 @@ public class StudentEditFragment extends Fragment {
                     Student student = dataSnapshot.getValue(Student.class);
 
                     imageUrl = student.getImageUrl();
-                    city = student.getCity();
                     fullname = student.getFullname();
                     email = student.getEmail();
 
@@ -128,18 +123,8 @@ public class StudentEditFragment extends Fragment {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                city = cityMenu.getText().toString();
-
-                if (!city.isEmpty()) {
-                    Log.d("YAZAN", "[+] Edit Student: passed validation");
-                    if (imageSetFlag) {
-                        Log.d("YAZAN", "[*] Edit Student: new image detected, uploading..");
-                        uploadProfilePicToStorage();;
-                    } else {
-                        Log.d("YAZAN", "[*] Edit Student: no image detected, continuing normal way");
-                        updateDatabase();
-                    }
+                if (imageSetFlag) {
+                    uploadProfilePicToStorage();;
                 }
             }
         });
@@ -160,11 +145,9 @@ public class StudentEditFragment extends Fragment {
         }
     }
     private void changeParamatersInView() {
-        cityMenu.setText(city);
         fullnameEditText.setText(fullname);
         emailEditText.setText(email);
         Picasso.get().load(imageUrl).placeholder(R.drawable.default_profile_pic).into(profilePic);
-
     }
 
     private void updateDatabase() {
@@ -174,11 +157,10 @@ public class StudentEditFragment extends Fragment {
             SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("imageUrl", profilePicUri);
+            editor.apply();
             updateValues.put("imageUrl", profilePicUri);
+            Log.d("ASDASDASD", "updateDatabase: NIGGA "+ profilePicUri);
         }
-        updateValues.put("city", city);
-
-
 
         studentReference.updateChildren(updateValues)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -204,12 +186,10 @@ public class StudentEditFragment extends Fragment {
                 .addOnSuccessListener(taskSnapshot -> {
                     storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         profilePicUri =  uri.toString();
-                        Log.d("uploadProfilePicToStorage: ", "File is uploaded, uri: " + profilePicUri);
                         updateDatabase(); // Link user to the database after image upload success
                     });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "uploadProfilePicToStorage: FAIL", e);
                     // Handle other failure cases or provide meaningful error messages
                 });
     }

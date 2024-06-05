@@ -39,15 +39,13 @@ public class LoginFragment extends Fragment {
     private String email;
 
     private String fcmToken;
-    private DatabaseReference teachersRef;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         mAuth = FirebaseAuth.getInstance();
-        teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
-
         Button loginButton = view.findViewById(R.id.login);
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +92,7 @@ public class LoginFragment extends Fragment {
 
 
     private void searchTeacherByUid(String uid) {
+        DatabaseReference teachersRef = FirebaseDatabase.getInstance().getReference("Teachers");
         teachersRef.orderByChild("uid").equalTo(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@android.support.annotation.NonNull DataSnapshot dataSnapshot) {
@@ -166,6 +165,11 @@ public class LoginFragment extends Fragment {
         editor.putString("fcmToken", fcmToken);
 
         editor.apply();
+
+        DatabaseReference updateFCM = FirebaseDatabase.getInstance().getReference("Teachers");
+        updateFCM.child(teacher.getUid()).child("fcmToken").setValue(fcmToken);
+
+
     }
 
     private void handleFoundStudent(Student student) {
@@ -180,6 +184,9 @@ public class LoginFragment extends Fragment {
         editor.putString("imageUrl", student.getImageUrl());
         editor.putString("fcmToken", fcmToken);
         editor.apply();
+
+        DatabaseReference updateFCM = FirebaseDatabase.getInstance().getReference("Students");
+        updateFCM.child(student.getUid()).child("fcmToken").setValue(fcmToken);
 
     }
     void getFCMToken(){

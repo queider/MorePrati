@@ -48,7 +48,7 @@ public class SearchFragment extends Fragment {
     private DatabaseReference teachersRef;
     private TeacherAdapter teacherAdapter;
     private RecyclerView recyclerView;
-
+    private ShapeableImageView profilePicImageView;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -67,20 +67,7 @@ public class SearchFragment extends Fragment {
 
         //loads profile pic image
 
-        requireContext();
-        SharedPreferences CurrentUserSP = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
-        String profilePicUri = CurrentUserSP.getString("imageUrl", ""); // Returns an empty string if "image" is not found
-        ShapeableImageView profilePicImageView = view.findViewById(R.id.profilePic);
-        if (!profilePicUri.isEmpty()) {
-            Picasso.get()
-                    .load(profilePicUri)
-                    .placeholder(R.drawable.default_profile_pic) // Placeholder image while loading
-                    .error(R.drawable.default_profile_pic) // Image to display if loading fails
-                    .fit() // Fit the image into the ImageView
-                    .centerCrop() // Center crop the image if it's not square
-                    .into(profilePicImageView);
-
-        }
+         profilePicImageView = view.findViewById(R.id.profilePic);
 
 
         //search menu
@@ -243,6 +230,24 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences CurrentUserSP = requireContext().getSharedPreferences("CurrentUser", Context.MODE_PRIVATE);
+        String profilePicUri = CurrentUserSP.getString("imageUrl", "");
+        if (!profilePicUri.isEmpty()) {
+            Picasso.get()
+                    .load(profilePicUri)
+                    .placeholder(R.drawable.default_profile_pic) // Placeholder image while loading
+                    .error(R.drawable.default_profile_pic) // Image to display if loading fails
+                    .fit() // Fit the image into the ImageView
+                    .centerCrop() // Center crop the image if it's not square
+                    .into(profilePicImageView);
+
+        }
+
+    }
+
     private void setUpRecyclerView() {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
@@ -283,10 +288,7 @@ public class SearchFragment extends Fragment {
         teacherAdapter = new TeacherAdapter(options, teacher -> {
             // Handle item click, for example, open a new activity
             TeacherInfoFragment teacherInfoFragment = new TeacherInfoFragment();
-
             Bundle args = new Bundle();
-            args.putString("fullname", teacher.getFullname());
-            args.putString("city", teacher.getCity());
             args.putString("uid", teacher.getUid());
             args.putSerializable("subjects", (Serializable) teacher.getSubjects());
             args.putString("wayOfLearning", teacher.getWayOfLearning());

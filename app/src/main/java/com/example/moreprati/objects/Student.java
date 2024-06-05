@@ -4,7 +4,7 @@ public class Student {
 
     private String fullname;
     private String email;
-    private String city;
+
     private String uid;
     private String imageUrl;
 
@@ -14,8 +14,8 @@ public class Student {
     public Student() { // Default constructor required for DataSnapshot.getValue(User.class)
 
     }
-    public Student (String fullname, String email, String city, String uid, String fcmToken, String imageUrl) {
-        this.city = city;
+    public Student (String fullname, String email, String uid, String fcmToken, String imageUrl) {
+
         this.fullname = fullname;
         this.email = email;
         this.uid = uid;
@@ -40,13 +40,6 @@ public class Student {
         this.email = email;
     }
 
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
 
     public String getUid() {
         return uid;

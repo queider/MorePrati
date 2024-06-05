@@ -1,6 +1,5 @@
 package com.example.moreprati.fragments;
 
-import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,7 +26,6 @@ import androidx.fragment.app.Fragment;
 import com.example.moreprati.R;
 import com.example.moreprati.activities.MainActivity;
 import com.example.moreprati.objects.Student;
-import com.example.moreprati.objects.Teacher;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -48,12 +46,11 @@ import java.util.regex.Pattern;
 
 
 public class SignUpStudentFragment extends Fragment {
-    private FirebaseAuth mAuth; // firebase thing
+    private FirebaseAuth mAuth;
     private String uid;
     private String fcmToken;
     private String fullname;
     private String email;
-    private String city;
     private String password;
 
     private ImageView profilePic;
@@ -67,21 +64,11 @@ public class SignUpStudentFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_up_student, container, false);
-        mAuth = FirebaseAuth.getInstance(); // firebase thing
+        mAuth = FirebaseAuth.getInstance();
 
         profilePic = view.findViewById(R.id.profilePic);
         cameraButton = view.findViewById(R.id.cameraButton);
 
-
-
-        //City menu setup:
-        Resources res = getResources();
-        String[] cities = res.getStringArray(R.array.cites);
-        AutoCompleteTextView cityMenu = view.findViewById(R.id.cityMenu);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, cities);
-        cityMenu.setAdapter(adapter);
-
-        // Camara:
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,14 +105,8 @@ public class SignUpStudentFragment extends Fragment {
                     password = passwordEditText.getText().toString();
                 }
 
-                city = cityMenu.getText().toString();
-
-                Log.d("YAZAN", "[*] Student Registration: Clicked, Wating for validation.");
                 if(validation()) {
-                    Log.d("YAZAN", "[+] Student Registration: Validation passed, started registration for " + fullname + ".");
                     registerStudent();
-                }else {
-                    Log.d("YAZAN", "[*] Student Registration: Validation failed");
                 }
             }
         });
@@ -139,18 +120,11 @@ public class SignUpStudentFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d("YAZAN", "[+] Student Registration: Registerd auth, doing database work now.");
                             Toast.makeText(requireContext(), "ההרשמה בוצעה בהצלחה", Toast.LENGTH_SHORT).show();
-
                             uid = mAuth.getCurrentUser().getUid();
-
-                            // Now you can link the user to additional information in the database
-                            reauthenticateUser(email, password);
+                            uploadProfilePicToStorage(profilePicLocalUri);
                             startActivity(new Intent(requireContext(), MainActivity.class));
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.d("YAZAN", "[+] Student Registration: Failed auth.");
                             Toast.makeText(requireContext(), "ההרשמה כשלה / משתמש קיים", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -164,27 +138,21 @@ public class SignUpStudentFragment extends Fragment {
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 fcmToken = task.getResult();
-                Log.d("YAZAN", "[+] Student Registration: got fcm token: " + fcmToken);
                 proceedWithLinking();
-            } else {
-                Log.d("YAZAN", "[-] Student Registration: fcm accumulation failed.");
             }
         });
     }
 
     private void proceedWithLinking() {
-        Student student = new Student(fullname, email, city, uid, fcmToken, profilePicUri);
+        Student student = new Student(fullname, email, uid, fcmToken, profilePicUri);
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Students");
         usersRef.child(uid).setValue(student)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d("YAZAN", "[+] Student Registration: created new student");
                         registerStudent(student);
                         Intent intent = new Intent(getActivity(), MainActivity.class);
                         startActivity(intent);
                         getActivity().finish();
-                    } else {
-                        Log.d("YAZAN", "[+] Student Registration: failed to create a student");
                     }
                 });
     }
@@ -210,35 +178,11 @@ public class SignUpStudentFragment extends Fragment {
                 .addOnSuccessListener(taskSnapshot -> {
                     storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         profilePicUri = uri.toString();
-                        Log.d("YAZAN", "[+] Student Registration: pic uploaded. pic: " + profilePicUri);
-                        linkUserToDatabase(); // Link user to the database after image upload success
+                        linkUserToDatabase();
                     });
-                })
-                .addOnFailureListener(e -> {
-                    Log.d("YAZAN", "[-] Student Registration: pic upload failed.");
-                    // Handle other failure cases or provide meaningful error messages
                 });
     }
 
-    private void reauthenticateUser(String email, String password) {
-        AuthCredential credential = EmailAuthProvider.getCredential(email, password);
-        FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null) {
-            user.reauthenticate(credential)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            // User has been reauthenticated successfully
-                            Log.d("YAZAN", "[+] Student Registration: reauthenticateUser ok, uploading pic next.");
-                            uploadProfilePicToStorage(profilePicLocalUri);
-                        } else {
-                            // Reauthentication failed
-                            Log.d("YAZAN", "[-] Student Registration: reauthenticateUser failed.");
-
-                        }
-                    });
-        }
-    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -256,7 +200,7 @@ public class SignUpStudentFragment extends Fragment {
     // form validation
     private boolean validation() {
 
-        if( fullname.isEmpty() || email.isEmpty() || city.isEmpty()) {
+        if( fullname.isEmpty() || email.isEmpty()) {
             Toast.makeText(getContext(), "מלא את כל השדות", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -283,6 +227,11 @@ public class SignUpStudentFragment extends Fragment {
 
         if (email.length() > 30){
             Toast.makeText(getContext(), "אימייל ארוך מידי", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (password.length() < 8){
+            Toast.makeText(getContext(), "סיסמה קצרה מידי", Toast.LENGTH_SHORT).show();
             return false;
         }
         
