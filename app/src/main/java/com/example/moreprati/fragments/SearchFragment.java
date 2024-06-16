@@ -298,6 +298,7 @@ public class SearchFragment extends Fragment {
             args.putFloat("rating", teacher.getRating());
             args.putString("fcmToken", teacher.getFcmToken());
             args.putInt("howManyRated", teacher.getHowManyRated());
+            args.putString("fullname", teacher.getFullname());
 
 
             teacherInfoFragment.setArguments(args);
